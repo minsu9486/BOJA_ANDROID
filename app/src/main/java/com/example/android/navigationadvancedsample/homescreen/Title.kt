@@ -18,21 +18,28 @@ package com.example.android.navigationadvancedsample.homescreen
 
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import androidx.activity.addCallback
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
+import com.example.android.navigationadvancedsample.MainActivity
 import com.example.android.navigationadvancedsample.R
+import com.github.kittinunf.fuel.core.extensions.authentication
+import com.github.kittinunf.fuel.core.extensions.cUrlString
+import com.github.kittinunf.fuel.httpGet
+import com.github.kittinunf.fuel.httpPost
+import com.github.kittinunf.result.Result
 import com.yuyakaido.android.cardstackview.CardStackLayoutManager
 import com.yuyakaido.android.cardstackview.CardStackListener
 import com.yuyakaido.android.cardstackview.Direction
 import com.yuyakaido.android.cardstackview.StackFrom
-import kotlin.system.exitProcess
+import org.json.JSONArray
+import org.json.JSONObject
 
 
 /**
@@ -40,12 +47,19 @@ import kotlin.system.exitProcess
  */
 class Title : Fragment(), CardStackListener {
 
+    val TAG = MainActivity::class.java.simpleName
+
     private lateinit var manager: CardStackLayoutManager
     private lateinit var viewAdapter: CardAdapter
 
-    private val mMaxSize = 6
+    private val mMaxSize = 10
+    private var userID = 0
+
     private var mCurrIndex = 0
     private var mCards = arrayOfNulls<CardMovie>(mMaxSize)
+
+    private var mLikedCards = arrayOfNulls<String>(mMaxSize)
+    private var mLikedIndex = 0
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -64,31 +78,72 @@ class Title : Fragment(), CardStackListener {
         // has login data
         else {
 
-            for (i in listOfTitles.indices) {
-                mCards[i] = CardMovie(i, listOfTitles[i]);
-            }
+            // show the bottom navigation
+            (activity as MainActivity).setBottomNavigationVisibility(View.VISIBLE)
 
-            manager = CardStackLayoutManager(this.context, this)
-            viewAdapter = CardAdapter(mCards, mMaxSize)
+            userID = sharedPref?.getInt("user_id", 0)!!
+            (getString(R.string.url_main) + "starts?user_id=").plus(userID.toString())
+                    .httpGet()
+                    .also { Log.d(TAG, it.cUrlString()) }
+                    .responseString { _, _, result ->
+                        when (result) {
+                            is Result.Failure -> {
+                                val ex = result.getException()
+                                println(ex)
+                                Log.v(TAG, "Failure: $ex")
+                            }
+                            is Result.Success -> {
+                                val data = result.get()
+                                println(data)
+                                Log.v(TAG, "Success: $data")
 
-            view.findViewById<RecyclerView>(R.id.cardstack_list).run {
-                // use this setting to improve performance if you know that changes
-                // in content do not change the layout size of the RecyclerView
-                setHasFixedSize(true)
+                                val jsonArray = JSONArray(data);
+                                // init the card data
+                                for (i in 0 until jsonArray.length()) {
+                                    mCards[i] = CardMovie(
+                                            i,
+                                            jsonArray.getJSONObject(i).getString("movieId"),
+                                            jsonArray.getJSONObject(i).getString("title"),
+                                            jsonArray.getJSONObject(i).getString("genres"),
+                                    );
+                                }
 
-                manager.setDirections(arrayListOf(Direction.Right, Direction.Left))
-                manager.setCanScrollHorizontal(true)
-                manager.setVisibleCount(5)
-                manager.setStackFrom(StackFrom.Bottom)
-                manager.setTranslationInterval(6.0f)
-                manager.setScaleInterval(0.95f)
-                manager.setMaxDegree(20.0f)
-                manager.topPosition = mCurrIndex;
+                                if(mCurrIndex == mMaxSize)
+                                    mCurrIndex = 0;
 
-                layoutManager = manager
-                adapter = viewAdapter // specify an viewAdapter (see also next example)
-            }
+                                manager = CardStackLayoutManager(this.context, this)
+                                viewAdapter = CardAdapter(mCards, mMaxSize)
+
+                                view.findViewById<RecyclerView>(R.id.cardstack_list).run {
+                                    // use this setting to improve performance if you know that changes
+                                    // in content do not change the layout size of the RecyclerView
+                                    setHasFixedSize(true)
+
+                                    manager.setDirections(arrayListOf(Direction.Right, Direction.Left))
+                                    manager.setCanScrollHorizontal(true)
+                                    manager.setVisibleCount(5)
+                                    manager.setStackFrom(StackFrom.Bottom)
+                                    manager.setTranslationInterval(6.0f)
+                                    manager.setScaleInterval(0.95f)
+                                    manager.setMaxDegree(20.0f)
+                                    manager.topPosition = mCurrIndex;
+
+                                    layoutManager = manager
+                                    adapter = viewAdapter // specify an viewAdapter (see also next example)
+                                }
+
+                            }
+                        }
+                    }
         }
+
+//        if(mCurrIndex == mMaxSize)
+//            mCurrIndex = 0;
+//
+//        // init the card data
+//        for (i in listOfTitles.indices) {
+//            mCards[i] = CardMovie(i, listOfTitles[i]);
+//        }
 
 //        view.findViewById<Button>(R.id.about_btn).setOnClickListener {
 //            findNavController().navigate(R.id.action_title_to_about)
@@ -119,11 +174,47 @@ class Title : Fragment(), CardStackListener {
     }
 
     override fun onCardSwiped(direction: Direction) {
-//        // last position reached, do something
-//        if (manager.topPosition == viewAdapter.itemCount) {
-//
-//        }
 
+        // the swiped movie = mCards[manager.topPosition - 1]
+
+        if(direction == Direction.Left) {
+
+        }
+        else if(direction == Direction.Right) {
+            mLikedCards[mLikedIndex] = mCards[manager.topPosition - 1]?.id
+
+            ++mLikedIndex
+        }
+
+        // last position reached, do something
+        if (manager.topPosition == viewAdapter.itemCount) {
+
+            var movieIDs = ""
+                for(i in 0 until mLikedIndex)
+                    movieIDs += "&movie_id=" + mLikedCards[i].toString()
+
+            (getString(R.string.url_main) + "ratings?user_id=").plus(userID.toString()).plus(movieIDs)
+                .httpPost()
+                .authentication()
+                .also { Log.d(TAG, it.cUrlString()) }
+                .responseString { _, _, result ->
+                    when (result) {
+                        is Result.Failure -> {
+                            val ex = result.getException()
+                            println(ex)
+                            Log.v(TAG, "Failure: $ex")
+                        }
+                        is Result.Success -> {
+                            val data = result.get()
+                            println(data)
+                            Log.v(TAG, "Success: $data")
+
+                        }
+                    }
+                }
+        }
+
+        // save the current position
         mCurrIndex = manager.topPosition;
     }
 
@@ -137,6 +228,13 @@ class Title : Fragment(), CardStackListener {
     }
 
     override fun onCardDisappeared(view: View, position: Int) {
+    }
+
+    fun resetData() {
+        mCurrIndex = 0
+        mCards
+        mLikedCards
+        mLikedIndex = 0
     }
 }
 
@@ -153,7 +251,7 @@ class CardAdapter(private val myDataset: Array<CardMovie?>, private val itemCoun
     override fun onBindViewHolder(viewHolder: CardViewHolder, position: Int) {
 
         viewHolder.view.findViewById<ImageView>(R.id.card_movie_image)
-                .setImageResource(listOfMovies[position % listOfMovies.size])
+                .setImageResource(R.drawable.movie_post_0)
 
         viewHolder.view.findViewById<AppCompatTextView>(R.id.card_movie_title).text = myDataset[position % itemCount]?.title
                 ?: "title uninit"

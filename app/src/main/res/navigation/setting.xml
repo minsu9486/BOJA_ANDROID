@@ -27,9 +27,6 @@
                 android:name="com.example.android.navigationadvancedsample.settingscreen.Setting"
                 android:label="Setting"
                 tools:layout="@layout/fragment_setting">
-<!--                <deepLink-->
-<!--                    android:id="@+id/deepLink_setting_to_home"-->
-<!--                    app:url="myapp://home"/>-->
         </fragment>
 
 </navigation>

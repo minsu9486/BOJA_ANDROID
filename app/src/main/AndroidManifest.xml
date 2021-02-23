@@ -37,7 +37,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
             <!-- This is added to handle a deep link -->
-            <nav-graph android:value="@navigation/setting" />
+<!--            <nav-graph android:value="@navigation/home" />-->
+<!--            <nav-graph android:value="@navigation/setting" />-->
         </activity>
     </application>
 

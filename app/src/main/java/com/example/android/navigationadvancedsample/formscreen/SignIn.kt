@@ -1,5 +1,6 @@
 package com.example.android.navigationadvancedsample.formscreen
 
+import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -15,6 +16,7 @@ import com.github.kittinunf.fuel.core.extensions.authentication
 import com.github.kittinunf.fuel.core.extensions.cUrlString
 import com.github.kittinunf.fuel.httpPost
 import com.github.kittinunf.result.Result
+import org.json.JSONObject
 
 class SignIn : Fragment() {
 
@@ -48,6 +50,13 @@ class SignIn : Fragment() {
                                 val data = result.get()
                                 println(data)
                                 Log.v(TAG, "Success: $data")
+
+                                val userID = JSONObject(data).getInt("user_id");
+
+                                val sharedPref = activity?.getSharedPreferences("LoginStatus", Context.MODE_PRIVATE)
+                                sharedPref?.edit()?.putInt("user_id", userID)?.apply()
+                                sharedPref?.edit()?.putBoolean("DidLogIn", true)?.apply()
+
                                 findNavController().navigate(R.id.action_signIn_to_registered)
                             }
                         }

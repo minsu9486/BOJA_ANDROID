@@ -16,7 +16,9 @@
 
 package com.example.android.navigationadvancedsample.listscreen
 
+import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -26,17 +28,52 @@ import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
+import com.example.android.navigationadvancedsample.MainActivity
 import com.example.android.navigationadvancedsample.R
+import com.example.android.navigationadvancedsample.homescreen.CardAdapter
+import com.example.android.navigationadvancedsample.homescreen.CardMovie
+import com.github.kittinunf.fuel.core.extensions.cUrlString
+import com.github.kittinunf.fuel.httpGet
+import com.github.kittinunf.result.Result
+import com.yuyakaido.android.cardstackview.CardStackLayoutManager
+import com.yuyakaido.android.cardstackview.Direction
+import com.yuyakaido.android.cardstackview.StackFrom
+import org.json.JSONArray
 
 /**
  * Shows a static leaderboard with multiple users.
  */
 class Leaderboard : Fragment() {
 
+    val TAG = MainActivity::class.java.simpleName
+
+    private var userID = 0
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_leaderboard, container, false)
+
+        val sharedPref = activity?.getSharedPreferences("LoginStatus", Context.MODE_PRIVATE)
+
+        userID = sharedPref?.getInt("user_id", 0)!!
+        (getString(R.string.url_main) + "recoMovies?user_id=").plus(userID.toString())
+                .httpGet()
+                .also { Log.d(TAG, it.cUrlString()) }
+                .responseString { _, _, result ->
+                    when (result) {
+                        is Result.Failure -> {
+                            val ex = result.getException()
+                            println(ex)
+                            Log.v(TAG, "Failure: $ex")
+                        }
+                        is Result.Success -> {
+                            val data = result.get()
+                            println(data)
+                            Log.v(TAG, "Success: $data")
+                        }
+                    }
+                }
 
         val viewAdapter = MyAdapter(Array(6) { "Person ${it + 1}" })
 
@@ -49,6 +86,7 @@ class Leaderboard : Fragment() {
             adapter = viewAdapter
 
         }
+
         return view
     }
 

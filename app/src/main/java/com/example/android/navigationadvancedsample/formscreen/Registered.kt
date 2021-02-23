@@ -42,8 +42,7 @@ class Registered : Fragment() {
         val view = inflater.inflate(R.layout.fragment_registered, container, false);
 
         // show the bottom navigation
-        var  mainActivity = activity as MainActivity
-        mainActivity.setBottomNavigationVisibility(View.VISIBLE)
+        (activity as MainActivity).setBottomNavigationVisibility(View.VISIBLE)
 
         // touch motion
         view.findViewById<ConstraintLayout>(R.id.title_constraint).setOnTouchListener { _, event ->

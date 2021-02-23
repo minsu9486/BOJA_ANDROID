@@ -56,7 +56,6 @@ class MainActivity : AppCompatActivity() {
      */
     private fun setupBottomNavigationBar() {
         bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottom_nav)
-        bottomNavigationView.visibility = View.INVISIBLE
 
         val navGraphIds = listOf(R.navigation.home, R.navigation.list, R.navigation.setting)
 
