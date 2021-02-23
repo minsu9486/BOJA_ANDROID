@@ -48,7 +48,7 @@ class Leaderboard : Fragment() {
 
     val TAG = MainActivity::class.java.simpleName
 
-    private val mMaxSize = 10
+    private var mMaxSize = 10
     private var userID = 0
     private var mCards = arrayOfNulls<CardMovie>(mMaxSize)
 
@@ -77,6 +77,7 @@ class Leaderboard : Fragment() {
 
                             val jsonArray = JSONArray(data);
                             // init the card data
+                            mMaxSize = jsonArray.length();
                             for (i in 0 until jsonArray.length()) {
                                 mCards[i] = CardMovie(
                                         i,
