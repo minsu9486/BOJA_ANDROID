@@ -17,17 +17,17 @@
 
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
-        android:id="@+id/home"
+        android:id="@+id/navGraph_home"
         android:icon="@drawable/ic_home"
         android:contentDescription="@string/cd_home"
         android:title="@string/title_home" />
     <item
-        android:id="@+id/list"
+        android:id="@+id/navGraph_list"
         android:icon="@drawable/ic_movie"
         android:contentDescription="@string/cd_form"
         android:title="@string/title_register" />
     <item
-        android:id="@+id/setting"
+        android:id="@+id/navGraph_setting"
         android:icon="@drawable/ic_setting"
         android:contentDescription="Setting"
         android:title="Setting" />

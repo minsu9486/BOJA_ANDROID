@@ -73,6 +73,10 @@ class Title : Fragment(), CardStackListener {
 
         // no login data
         if(didLogIn == false) {
+
+            // hide the bottom navigation
+            (activity as MainActivity).setBottomNavigationVisibility(View.INVISIBLE)
+
             findNavController().navigate(R.id.action_title_to_register)
         }
         // has login data

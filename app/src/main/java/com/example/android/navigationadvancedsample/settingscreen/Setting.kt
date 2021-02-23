@@ -7,12 +7,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentActivity
+import androidx.fragment.app.FragmentManager
+import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
 import com.example.android.navigationadvancedsample.MainActivity
 import com.example.android.navigationadvancedsample.R
-import com.example.android.navigationadvancedsample.formscreen.SignIn
-import com.example.android.navigationadvancedsample.homescreen.Title
+import com.google.android.material.bottomnavigation.BottomNavigationView
 
 
 class Setting : Fragment()
@@ -34,14 +34,8 @@ class Setting : Fragment()
             // hide the bottom navigation
             (activity as MainActivity).setBottomNavigationVisibility(View.INVISIBLE)
 
-//            // move to the login screen
-//            val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
-//            val inflater = navHostFragment.navController.navInflater
-//            val graph = inflater.inflate(R.navigation.booking_navigation)
-//            graph.startDestination = R.id.signIn
-//            findNavController().setGraph(graph)
-
-            //findNavController().setGraph(R.navigation.home)
+            // move to the login screen
+            (activity as MainActivity).findViewById<BottomNavigationView>(R.id.bottom_nav).selectedItemId = R.id.navGraph_home
         }
 
 //        val bodyJson = """
