@@ -238,30 +238,6 @@ class Title : Fragment(), CardStackListener {
     }
 }
 
-class CardAdapter(private val myDataset: Array<CardMovie?>, private val itemCount: Int) : RecyclerView.Adapter<CardAdapter.CardViewHolder>() {
-
-    class CardViewHolder(var view: View) : RecyclerView.ViewHolder(view) {
-    }
-
-    override fun onCreateViewHolder(viewGroup: ViewGroup, itemType: Int): CardViewHolder {
-        val view = LayoutInflater.from(viewGroup.context).inflate(R.layout.card_view_item, viewGroup, false)
-        return CardViewHolder(view)
-    }
-
-    override fun onBindViewHolder(viewHolder: CardViewHolder, position: Int) {
-
-        viewHolder.view.findViewById<ImageView>(R.id.card_movie_image)
-                .setImageResource(R.drawable.movie_post_0)
-
-        viewHolder.view.findViewById<AppCompatTextView>(R.id.card_movie_title).text = myDataset[position % itemCount]?.title
-                ?: "title uninit"
-    }
-
-    override fun getItemCount(): Int {
-        return itemCount
-    }
-}
-
 private val listOfMovies = listOf(
         R.drawable.movie_post_1,
         R.drawable.movie_post_2,

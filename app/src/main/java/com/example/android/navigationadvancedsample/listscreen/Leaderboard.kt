@@ -24,6 +24,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
@@ -47,7 +48,9 @@ class Leaderboard : Fragment() {
 
     val TAG = MainActivity::class.java.simpleName
 
+    private val mMaxSize = 10
     private var userID = 0
+    private var mCards = arrayOfNulls<CardMovie>(mMaxSize)
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -71,11 +74,22 @@ class Leaderboard : Fragment() {
                             val data = result.get()
                             println(data)
                             Log.v(TAG, "Success: $data")
+
+                            val jsonArray = JSONArray(data);
+                            // init the card data
+                            for (i in 0 until jsonArray.length()) {
+                                mCards[i] = CardMovie(
+                                        i,
+                                        jsonArray.getJSONObject(i).getString("movieId"),
+                                        jsonArray.getJSONObject(i).getString("title"),
+                                        jsonArray.getJSONObject(i).getString("genres"),
+                                );
+                            }
                         }
                     }
                 }
 
-        val viewAdapter = MyAdapter(Array(6) { "Person ${it + 1}" })
+        val viewAdapter = MyAdapter(mCards, mMaxSize)
 
         view.findViewById<RecyclerView>(R.id.leaderboard_list).run {
             // use this setting to improve performance if you know that changes
@@ -92,7 +106,7 @@ class Leaderboard : Fragment() {
 
 }
 
-class MyAdapter(private val myDataset: Array<String>) :
+class MyAdapter(private val myDataset: Array<CardMovie?>, private val itemCount: Int) :
     RecyclerView.Adapter<MyAdapter.ViewHolder>() {
 
     // Provide a reference to the views for each data item
@@ -120,23 +134,29 @@ class MyAdapter(private val myDataset: Array<String>) :
 //        holder.item.findViewById<TextView>(R.id.user_name_text).text = myDataset[position]
 
         holder.item.findViewById<ImageView>(R.id.user_avatar_image)
-                .setImageResource(listOfAvatars[position % listOfAvatars.size])
+                .setImageResource(R.drawable.movie_post_0)
 
-        holder.item.setOnClickListener {
-            val bundle = bundleOf(USERNAME_KEY to myDataset[position])
+        holder.item.findViewById<AppCompatTextView>(R.id.user_name_text).text = myDataset[position % itemCount]?.title
+                ?: "title uninit"
+
+//        holder.item.setOnClickListener {
+//            val bundle = bundleOf(USERNAME_KEY to myDataset[position])
 
 //            holder.item.findNavController().navigate(
 //                    R.id.action_leaderboard_to_userProfile,
 //                bundle)
         }
+
+    override fun getItemCount(): Int {
+        return itemCount
     }
 
-    // Return the size of your dataset (invoked by the layout manager)
-    override fun getItemCount() = myDataset.size
+//    // Return the size of your dataset (invoked by the layout manager)
+//    override fun getItemCount() = myDataset.size
 
-    companion object {
-        const val USERNAME_KEY = "userName"
-    }
+//    companion object {
+//        const val USERNAME_KEY = "userName"
+//    }
 }
 
 private val listOfAvatars = listOf(
