@@ -81,7 +81,7 @@ class Leaderboard : Fragment() {
                             for (i in 0 until jsonArray.length()) {
                                 mCards[i] = CardMovie(
                                         i,
-                                        jsonArray.getJSONObject(i).getString("movieId"),
+                                        jsonArray.getJSONObject(i).getString("movie_id"),
                                         jsonArray.getJSONObject(i).getString("title"),
                                         jsonArray.getJSONObject(i).getString("genres"),
                                 );
