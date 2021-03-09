@@ -67,9 +67,9 @@
             android:id="@+id/action_title_to_register"
             app:destination="@id/register"/>
     </fragment>
-    <fragment
-        android:id="@+id/aboutScreen"
-        android:name="com.example.android.navigationadvancedsample.homescreen.About"
-        android:label="@string/title_about"
-        tools:layout="@layout/fragment_about"/>
+<!--    <fragment-->
+<!--        android:id="@+id/aboutScreen"-->
+<!--        android:name="com.example.android.navigationadvancedsample.homescreen.About"-->
+<!--        android:label="@string/title_about"-->
+<!--        tools:layout="@layout/fragment_about"/>-->
 </navigation>
