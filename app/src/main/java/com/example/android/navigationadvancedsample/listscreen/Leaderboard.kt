@@ -17,29 +17,27 @@
 package com.example.android.navigationadvancedsample.listscreen
 
 import android.content.Context
+import android.graphics.Rect
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.widget.AppCompatTextView
-import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
-import androidx.navigation.findNavController
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.android.navigationadvancedsample.MainActivity
 import com.example.android.navigationadvancedsample.R
-import com.example.android.navigationadvancedsample.homescreen.CardAdapter
 import com.example.android.navigationadvancedsample.homescreen.CardMovie
 import com.github.kittinunf.fuel.core.extensions.cUrlString
 import com.github.kittinunf.fuel.httpGet
 import com.github.kittinunf.result.Result
-import com.yuyakaido.android.cardstackview.CardStackLayoutManager
-import com.yuyakaido.android.cardstackview.Direction
-import com.yuyakaido.android.cardstackview.StackFrom
 import org.json.JSONArray
+
 
 /**
  * Shows a static leaderboard with multiple users.
@@ -48,7 +46,7 @@ class Leaderboard : Fragment() {
 
     val TAG = MainActivity::class.java.simpleName
 
-    private var mMaxSize = 10
+    private var mMaxSize = 4
     private var userID = 0
     private var mCards = arrayOfNulls<CardMovie>(mMaxSize)
 
@@ -66,9 +64,11 @@ class Leaderboard : Fragment() {
                 .responseString { _, _, result ->
                     when (result) {
                         is Result.Failure -> {
-                            val ex = result.getException()
-                            println(ex)
-                            Log.v(TAG, "Failure: $ex")
+                            val data = result.error
+                            Log.v(TAG, "Failure, ErrorData: $data")
+
+                            val message = result.error.message ?: "Error"
+                            Toast.makeText(view.context, message, Toast.LENGTH_LONG).show()
                         }
                         is Result.Success -> {
                             val data = result.get()
@@ -91,8 +91,15 @@ class Leaderboard : Fragment() {
                 }
 
         val viewAdapter = MyAdapter(mCards, mMaxSize)
+        val recyclerView = view.findViewById<RecyclerView>(R.id.leaderboard_list);
 
-        view.findViewById<RecyclerView>(R.id.leaderboard_list).run {
+        val gridManager = GridLayoutManager(activity, 2, GridLayoutManager.VERTICAL, false)
+        recyclerView.layoutManager = gridManager
+
+//        val x = (resources.displayMetrics.density * 4).toInt() //converting dp to pixels
+//        recyclerView.addItemDecoration(MarginItemDecoration(x)) //setting space between items in RecyclerView
+
+        recyclerView.run {
             // use this setting to improve performance if you know that changes
             // in content do not change the layout size of the RecyclerView
             setHasFixedSize(true)
@@ -160,11 +167,43 @@ class MyAdapter(private val myDataset: Array<CardMovie?>, private val itemCount:
 //    }
 }
 
-private val listOfAvatars = listOf(
-    R.drawable.movie_post_1,
-    R.drawable.movie_post_2,
-    R.drawable.movie_post_3,
-    R.drawable.movie_post_4,
-    R.drawable.movie_post_5,
-    R.drawable.movie_post_6
-)
+class MarginItemDecoration(
+        private val spaceSize: Int,
+        private val spanCount: Int = 1,
+        private val orientation: Int = GridLayoutManager.VERTICAL
+) : RecyclerView.ItemDecoration() {
+    override fun getItemOffsets(
+            outRect: Rect, view: View,
+            parent: RecyclerView, state: RecyclerView.State
+    ) {
+        with(outRect) {
+            if (orientation == GridLayoutManager.VERTICAL) {
+                if (parent.getChildAdapterPosition(view) < spanCount) {
+                    top = spaceSize
+                }
+                if (parent.getChildAdapterPosition(view) % spanCount == 0) {
+                    left = spaceSize
+                }
+            } else {
+                if (parent.getChildAdapterPosition(view) < spanCount) {
+                    left = spaceSize
+                }
+                if (parent.getChildAdapterPosition(view) % spanCount == 0) {
+                    top = spaceSize
+                }
+            }
+
+            right = spaceSize
+            bottom = spaceSize
+        }
+    }
+}
+
+//private val listOfAvatars = listOf(
+//    R.drawable.movie_post_1,
+//    R.drawable.movie_post_2,
+//    R.drawable.movie_post_3,
+//    R.drawable.movie_post_4,
+//    R.drawable.movie_post_5,
+//    R.drawable.movie_post_6
+//)

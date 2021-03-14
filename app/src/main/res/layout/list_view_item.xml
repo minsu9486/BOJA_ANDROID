@@ -20,18 +20,16 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:background="@android:color/background_light"
-    tools:layout_editor_absoluteY="81dp">
+    android:layout_gravity="center"
+    android:padding="8dp"
+    android:background="@android:color/background_light">
 
 
     <ImageView
         android:id="@+id/user_avatar_image"
         android:layout_width="150dp"
         android:layout_height="200dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginBottom="8dp"
+
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"

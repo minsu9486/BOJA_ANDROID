@@ -18,6 +18,10 @@
     <string name="app_name">BOJA</string>
     <string name="url_main">http://10.0.2.2:3000/</string>
 
+<!--    Azure-->
+    <string name="Azure_key">465abd11794b450aab459f7e79a29df3</string>
+    <string name="Azure_Search_URL">https://api.bing.microsoft.com/v7.0/images/search</string>
+
     <string name="select_an_avatar">Select an Avatar</string>
     <string name="name">Name</string>
     <string name="email">Email</string>

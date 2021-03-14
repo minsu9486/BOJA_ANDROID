@@ -22,8 +22,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import androidx.appcompat.widget.AppCompatTextView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
@@ -52,7 +51,7 @@ class Title : Fragment(), CardStackListener {
     private lateinit var manager: CardStackLayoutManager
     private lateinit var viewAdapter: CardAdapter
 
-    private val mMaxSize = 10
+    private val mMaxSize = 5 // 10
     private var userID = 0
 
     private var mCurrIndex = 0
@@ -60,6 +59,9 @@ class Title : Fragment(), CardStackListener {
 
     private var mLikedCards = arrayOfNulls<String>(mMaxSize)
     private var mLikedIndex = 0
+
+    private var mHateCards = arrayOfNulls<String>(mMaxSize)
+    private var mHateIndex = 0
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -92,18 +94,19 @@ class Title : Fragment(), CardStackListener {
                     .responseString { _, _, result ->
                         when (result) {
                             is Result.Failure -> {
-                                val ex = result.getException()
-                                println(ex)
-                                Log.v(TAG, "Failure: $ex")
+                                val data = result.error.errorData.toString(Charsets.UTF_8)
+                                Log.v(TAG, "Failure, ErrorData: $data")
+
+                                val message = JSONObject(data).getString("message")?:"Error"
+                                Toast.makeText(view.context, message, Toast.LENGTH_LONG).show()
                             }
                             is Result.Success -> {
                                 val data = result.get()
-                                println(data)
                                 Log.v(TAG, "Success: $data")
 
                                 val jsonArray = JSONArray(data);
-                                // init the card data
-                                for (i in 0 until jsonArray.length()) {
+                                // init the card data (until mMaxSize or jsonArray.length())
+                                for (i in 0 until mMaxSize) {
                                     mCards[i] = CardMovie(
                                             i,
                                             jsonArray.getJSONObject(i).getString("movieId"),
@@ -182,7 +185,9 @@ class Title : Fragment(), CardStackListener {
         // the swiped movie = mCards[manager.topPosition - 1]
 
         if(direction == Direction.Left) {
+            mHateCards[mHateIndex] = mCards[manager.topPosition - 1]?.id
 
+            ++mHateIndex
         }
         else if(direction == Direction.Right) {
             mLikedCards[mLikedIndex] = mCards[manager.topPosition - 1]?.id
@@ -193,20 +198,29 @@ class Title : Fragment(), CardStackListener {
         // last position reached, do something
         if (manager.topPosition == viewAdapter.itemCount) {
 
-            var movieIDs = ""
+            // Liked Movie IDs
+            var movieLikedIDs = ""
                 for(i in 0 until mLikedIndex)
-                    movieIDs += "&movie_id=" + mLikedCards[i].toString()
+                    movieLikedIDs += "&movie_id=" + mLikedCards[i].toString()
 
-            (getString(R.string.url_main) + "ratings?user_id=").plus(userID.toString()).plus(movieIDs)
+            // Hate Movie IDs
+            var movieHateIDs = ""
+            for(i in 0 until mHateIndex)
+                movieHateIDs += "&movie_id=" + mHateCards[i].toString()
+
+            // HTTP REQUEST POST
+            (getString(R.string.url_main) + "ratings?user_id=").plus(userID.toString()).plus(movieLikedIDs)
                 .httpPost()
                 .authentication()
                 .also { Log.d(TAG, it.cUrlString()) }
                 .responseString { _, _, result ->
                     when (result) {
                         is Result.Failure -> {
-                            val ex = result.getException()
-                            println(ex)
-                            Log.v(TAG, "Failure: $ex")
+                            val data = result.error.errorData.toString(Charsets.UTF_8)
+                            Log.v(TAG, "Failure, ErrorData: $data")
+
+                            val message = JSONObject(data).getString("message")?:"Error"
+                            Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show()
                         }
                         is Result.Success -> {
                             val data = result.get()
@@ -236,9 +250,11 @@ class Title : Fragment(), CardStackListener {
 
     fun resetData() {
         mCurrIndex = 0
-        mCards
-        mLikedCards
+        mCards = arrayOfNulls<CardMovie>(mMaxSize)
+        mLikedCards = arrayOfNulls<String>(mMaxSize)
         mLikedIndex = 0
+        mHateCards = arrayOfNulls<String>(mMaxSize)
+        mHateIndex = 0
     }
 }
 

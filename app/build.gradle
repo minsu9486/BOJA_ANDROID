@@ -72,6 +72,7 @@ dependencies {
 
     // Card Stack View
     implementation 'com.yuyakaido.android:card-stack-view:2.3.4'
+    implementation 'com.squareup.picasso:picasso:2.8'
 
     // Login
     implementation 'com.github.kittinunf.fuel:fuel:2.3.1'

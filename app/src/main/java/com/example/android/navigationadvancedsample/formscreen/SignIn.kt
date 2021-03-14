@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.example.android.navigationadvancedsample.MainActivity
@@ -42,9 +43,11 @@ class SignIn : Fragment() {
                     .responseString { _, _, result ->
                         when (result) {
                             is Result.Failure -> {
-                                val ex = result.getException()
-                                println(ex)
-                                Log.v(TAG, "Failure: $ex")
+                                val data = result.error.errorData.toString(Charsets.UTF_8)
+                                Log.v(TAG, "Failure, ErrorData: $data")
+
+                                val message = JSONObject(data).getString("message")?:"Error"
+                                Toast.makeText(view.context, message, Toast.LENGTH_LONG).show()
                             }
                             is Result.Success -> {
                                 val data = result.get()
