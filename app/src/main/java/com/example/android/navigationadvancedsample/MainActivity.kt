@@ -16,14 +16,20 @@
 
 package com.example.android.navigationadvancedsample
 
+import android.opengl.Visibility
 import android.os.Bundle
+import android.util.AttributeSet
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.FragmentContainerView
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.navigation.NavController
 import androidx.navigation.ui.setupActionBarWithNavController
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.progressindicator.CircularProgressIndicator
+import android.view.ViewGroup.LayoutParams
+import android.view.WindowManager
 
 /**
  * An activity that inflates a layout that has a [BottomNavigationView].
@@ -32,12 +38,14 @@ class MainActivity : AppCompatActivity() {
 
     var currentNavController: LiveData<NavController>? = null
     lateinit var bottomNavigationView: BottomNavigationView
+    lateinit var progressIndicator: CircularProgressIndicator
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         if (savedInstanceState == null) {
             setupBottomNavigationBar()
+            setupProgressIndicator()
         } // Else, need to wait for onRestoreInstanceState
     }
 
@@ -49,6 +57,7 @@ class MainActivity : AppCompatActivity() {
         // and its selectedItemId, we can proceed with setting up the
         // BottomNavigationBar with Navigation
         setupBottomNavigationBar()
+        setupProgressIndicator()
     }
 
     /**
@@ -75,6 +84,11 @@ class MainActivity : AppCompatActivity() {
         currentNavController = controller
     }
 
+    private fun setupProgressIndicator() {
+        progressIndicator = findViewById<CircularProgressIndicator>(R.id.progress_indicator)
+        progressIndicator.visibility = View.INVISIBLE
+    }
+
     override fun onSupportNavigateUp(): Boolean {
         return currentNavController?.value?.navigateUp() ?: false
     }
@@ -82,5 +96,18 @@ class MainActivity : AppCompatActivity() {
     fun setBottomNavigationVisibility(visibility: Int) {
         // get the reference of the bottomNavigationView and set the visibility.
         bottomNavigationView.visibility = visibility
+    }
+
+    fun setProgressIndicator(view : View, turnOn : Boolean) {
+        // TRUE
+        if(turnOn) {
+            progressIndicator.visibility = View.VISIBLE
+            window.setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE, WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
+        }
+        // FALSE
+        else {
+            progressIndicator.visibility = View.INVISIBLE
+            window.clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+        }
     }
 }

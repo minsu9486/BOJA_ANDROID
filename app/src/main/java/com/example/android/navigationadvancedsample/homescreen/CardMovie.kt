@@ -9,13 +9,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.appcompat.widget.AppCompatTextView
-import androidx.core.graphics.toColorInt
 import androidx.recyclerview.widget.RecyclerView
+import com.example.android.navigationadvancedsample.MainActivity
 import com.example.android.navigationadvancedsample.R
 import com.github.kittinunf.fuel.httpGet
 import com.github.kittinunf.result.Result
 import com.squareup.picasso.Picasso
-import org.json.JSONArray
 import org.json.JSONObject
 
 data class CardMovie(var index: Int?, var id: String?, var title: String?, var genre: String?): Parcelable {
@@ -66,6 +65,8 @@ class CardAdapter(private val myDataset: Array<CardMovie?>, private val itemCoun
         // https://docs.microsoft.com/en-us/bing/search-apis/bing-image-search/reference/query-parameters
         val searchOptions = "&count=1" + "&aspect=Tall" + "&size=Medium"
 
+        (viewHolder.view.context as MainActivity).setProgressIndicator(viewHolder.view, true)
+
         // https://docs.microsoft.com/en-us/bing/search-apis/bing-image-search/reference/endpoints
         (viewHolder.view.context.getString(R.string.Azure_Search_URL) + "?q=" + movieTitle + searchOptions)
                 .httpGet()
@@ -75,11 +76,14 @@ class CardAdapter(private val myDataset: Array<CardMovie?>, private val itemCoun
                         is Result.Failure -> {
 //                            val data = result
                             println(result)
+
+                            (viewHolder.view.context as MainActivity).setProgressIndicator(viewHolder.view, false)
                         }
                         is Result.Success -> {
                             val data = result.get()
                             Log.v("CardMovie", data)
 
+                            (viewHolder.view.context as MainActivity).setProgressIndicator(viewHolder.view, false)
 
                             // https://docs.microsoft.com/en-us/bing/search-apis/bing-image-search/reference/response-objects#imageanswer
                             val imageData = JSONObject(data).getJSONArray("value").getJSONObject(0);

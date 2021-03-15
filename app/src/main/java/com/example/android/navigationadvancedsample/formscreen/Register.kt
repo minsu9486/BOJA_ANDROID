@@ -65,6 +65,8 @@ class Register : Fragment() {
             }
             // request
             else {
+                (activity as MainActivity).setProgressIndicator(view, true)
+
                 (getString(R.string.url_main) + "users?username=").plus(textUsername.toString()).plus("&passcode=").plus(textPassword.toString())
                         .httpPost()
                         .authentication()
@@ -75,6 +77,8 @@ class Register : Fragment() {
                                     val data = result.error.errorData.toString(Charsets.UTF_8)
                                     Log.v(TAG, "Failure, ErrorData: $data")
 
+                                    (activity as MainActivity).setProgressIndicator(view, false)
+
                                     val message = JSONObject(data).getString("message") ?: "Error"
                                     Toast.makeText(view.context, message, Toast.LENGTH_LONG).show()
                                 }
@@ -82,6 +86,9 @@ class Register : Fragment() {
                                     val data = result.get()
                                     println(data)
                                     Log.v(TAG, "Success: $data")
+
+                                    (activity as MainActivity).setProgressIndicator(view, false)
+
                                     findNavController().navigate(R.id.action_register_to_registered)
                                 }
                             }

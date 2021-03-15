@@ -33,6 +33,8 @@ class SignIn : Fragment() {
 
 //            findNavController().navigate(R.id.action_signIn_to_registered)
 
+            (activity as MainActivity).setProgressIndicator(view, true)
+
             val textUsername = view.findViewById<EditText>(R.id.user_name_text).text;
             val textPassword = view.findViewById<EditText>(R.id.password_text).text;
 
@@ -46,6 +48,8 @@ class SignIn : Fragment() {
                                 val data = result.error.errorData.toString(Charsets.UTF_8)
                                 Log.v(TAG, "Failure, ErrorData: $data")
 
+                                (activity as MainActivity).setProgressIndicator(view, false)
+
                                 val message = JSONObject(data).getString("message")?:"Error"
                                 Toast.makeText(view.context, message, Toast.LENGTH_LONG).show()
                             }
@@ -53,6 +57,8 @@ class SignIn : Fragment() {
                                 val data = result.get()
                                 println(data)
                                 Log.v(TAG, "Success: $data")
+
+                                (activity as MainActivity).setProgressIndicator(view, false)
 
                                 val userID = JSONObject(data).getInt("user_id");
 

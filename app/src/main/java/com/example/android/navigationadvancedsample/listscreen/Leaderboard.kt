@@ -17,17 +17,17 @@
 package com.example.android.navigationadvancedsample.listscreen
 
 import android.content.Context
-import android.graphics.Rect
 import android.os.Bundle
 import android.util.Log
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.fragment.app.Fragment
-import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.android.navigationadvancedsample.MainActivity
@@ -46,7 +46,7 @@ class Leaderboard : Fragment() {
 
     val TAG = MainActivity::class.java.simpleName
 
-    private var mMaxSize = 4
+    private var mMaxSize = 10 + 1 // 1 for the button at the end
     private var userID = 0
     private var mCards = arrayOfNulls<CardMovie>(mMaxSize)
 
@@ -54,8 +54,9 @@ class Leaderboard : Fragment() {
                               savedInstanceState: Bundle?): View? {
         // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_leaderboard, container, false)
-
         val sharedPref = activity?.getSharedPreferences("LoginStatus", Context.MODE_PRIVATE)
+
+        (activity as MainActivity).setProgressIndicator(view, true)
 
         userID = sharedPref?.getInt("user_id", 0)!!
         (getString(R.string.url_main) + "recoMovies?user_id=").plus(userID.toString())
@@ -67,6 +68,8 @@ class Leaderboard : Fragment() {
                             val data = result.error
                             Log.v(TAG, "Failure, ErrorData: $data")
 
+                            (activity as MainActivity).setProgressIndicator(view, false)
+
                             val message = result.error.message ?: "Error"
                             Toast.makeText(view.context, message, Toast.LENGTH_LONG).show()
                         }
@@ -74,6 +77,8 @@ class Leaderboard : Fragment() {
                             val data = result.get()
                             println(data)
                             Log.v(TAG, "Success: $data")
+
+                            (activity as MainActivity).setProgressIndicator(view, false)
 
                             val jsonArray = JSONArray(data);
                             // init the card data
@@ -93,7 +98,16 @@ class Leaderboard : Fragment() {
         val viewAdapter = MyAdapter(mCards, mMaxSize)
         val recyclerView = view.findViewById<RecyclerView>(R.id.leaderboard_list);
 
-        val gridManager = GridLayoutManager(activity, 2, GridLayoutManager.VERTICAL, false)
+        val gridLastIndex = mMaxSize - 1
+        val gridSpandCount = 2
+        val gridManager = GridLayoutManager(activity, gridSpandCount, GridLayoutManager.VERTICAL, false)
+        gridManager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
+            override fun getSpanSize(position: Int) =  when (position) {
+                gridLastIndex -> gridSpandCount // the last item: button
+                else -> 1
+            }
+        }
+
         recyclerView.layoutManager = gridManager
 
 //        val x = (resources.displayMetrics.density * 4).toInt() //converting dp to pixels
@@ -117,19 +131,26 @@ class Leaderboard : Fragment() {
 class MyAdapter(private val myDataset: Array<CardMovie?>, private val itemCount: Int) :
     RecyclerView.Adapter<MyAdapter.ViewHolder>() {
 
-    // Provide a reference to the views for each data item
-    // Complex data items may need more than one view per item, and
-    // you provide access to all the views for a data item in a view holder.
-    // Each data item is just a string in this case that is shown in a TextView.
     class ViewHolder(val item: View) : RecyclerView.ViewHolder(item)
 
+    val TYPE_ITEM = 1
+    val TYPE_LOAD = 2
 
     // Create new views (invoked by the layout manager)
     override fun onCreateViewHolder(parent: ViewGroup,
                                     viewType: Int): ViewHolder {
         // create a new view
-        val itemView = LayoutInflater.from(parent.context)
-            .inflate(R.layout.list_view_item, parent, false)
+        lateinit var itemView : View
+
+        if(viewType == TYPE_ITEM) {
+            itemView = LayoutInflater.from(parent.context)
+                    .inflate(R.layout.list_view_item, parent, false)
+        }
+        else if(viewType == TYPE_LOAD) {
+
+            itemView = LayoutInflater.from(parent.context)
+                    .inflate(R.layout.list_view_button, parent, false)
+        }
 
 
         return ViewHolder(itemView)
@@ -141,11 +162,18 @@ class MyAdapter(private val myDataset: Array<CardMovie?>, private val itemCount:
         // - replace the contents of the view with that element
 //        holder.item.findViewById<TextView>(R.id.user_name_text).text = myDataset[position]
 
-        holder.item.findViewById<ImageView>(R.id.user_avatar_image)
-                .setImageResource(R.drawable.movie_post_0)
+        if(holder.itemViewType == TYPE_ITEM) {
+            holder.item.findViewById<ImageView>(R.id.user_avatar_image)
+                    .setImageResource(R.drawable.movie_post_0)
 
-        holder.item.findViewById<AppCompatTextView>(R.id.user_name_text).text = myDataset[position % itemCount]?.title
-                ?: "title uninit"
+            holder.item.findViewById<AppCompatTextView>(R.id.user_name_text).text = myDataset[position % itemCount]?.title
+                    ?: "title uninit"
+        }
+        else if(holder.itemViewType == TYPE_LOAD) {
+            holder.item.setOnClickListener {
+                Toast.makeText(holder.itemView.context, holder.item.contentDescription, Toast.LENGTH_LONG).show()
+            }
+        }
 
 //        holder.item.setOnClickListener {
 //            val bundle = bundleOf(USERNAME_KEY to myDataset[position])
@@ -159,6 +187,10 @@ class MyAdapter(private val myDataset: Array<CardMovie?>, private val itemCount:
         return itemCount
     }
 
+    override fun getItemViewType(position: Int): Int {
+        return if (position == (myDataset.size - 1)) TYPE_LOAD else TYPE_ITEM
+    }
+
 //    // Return the size of your dataset (invoked by the layout manager)
 //    override fun getItemCount() = myDataset.size
 
@@ -167,37 +199,37 @@ class MyAdapter(private val myDataset: Array<CardMovie?>, private val itemCount:
 //    }
 }
 
-class MarginItemDecoration(
-        private val spaceSize: Int,
-        private val spanCount: Int = 1,
-        private val orientation: Int = GridLayoutManager.VERTICAL
-) : RecyclerView.ItemDecoration() {
-    override fun getItemOffsets(
-            outRect: Rect, view: View,
-            parent: RecyclerView, state: RecyclerView.State
-    ) {
-        with(outRect) {
-            if (orientation == GridLayoutManager.VERTICAL) {
-                if (parent.getChildAdapterPosition(view) < spanCount) {
-                    top = spaceSize
-                }
-                if (parent.getChildAdapterPosition(view) % spanCount == 0) {
-                    left = spaceSize
-                }
-            } else {
-                if (parent.getChildAdapterPosition(view) < spanCount) {
-                    left = spaceSize
-                }
-                if (parent.getChildAdapterPosition(view) % spanCount == 0) {
-                    top = spaceSize
-                }
-            }
-
-            right = spaceSize
-            bottom = spaceSize
-        }
-    }
-}
+//class MarginItemDecoration(
+//        private val spaceSize: Int,
+//        private val spanCount: Int = 1,
+//        private val orientation: Int = GridLayoutManager.VERTICAL
+//) : RecyclerView.ItemDecoration() {
+//    override fun getItemOffsets(
+//            outRect: Rect, view: View,
+//            parent: RecyclerView, state: RecyclerView.State
+//    ) {
+//        with(outRect) {
+//            if (orientation == GridLayoutManager.VERTICAL) {
+//                if (parent.getChildAdapterPosition(view) < spanCount) {
+//                    top = spaceSize
+//                }
+//                if (parent.getChildAdapterPosition(view) % spanCount == 0) {
+//                    left = spaceSize
+//                }
+//            } else {
+//                if (parent.getChildAdapterPosition(view) < spanCount) {
+//                    left = spaceSize
+//                }
+//                if (parent.getChildAdapterPosition(view) % spanCount == 0) {
+//                    top = spaceSize
+//                }
+//            }
+//
+//            right = spaceSize
+//            bottom = spaceSize
+//        }
+//    }
+//}
 
 //private val listOfAvatars = listOf(
 //    R.drawable.movie_post_1,

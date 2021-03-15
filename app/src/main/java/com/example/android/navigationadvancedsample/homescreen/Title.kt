@@ -22,6 +22,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
@@ -50,8 +51,9 @@ class Title : Fragment(), CardStackListener {
 
     private lateinit var manager: CardStackLayoutManager
     private lateinit var viewAdapter: CardAdapter
+    private lateinit var loadButton: Button
 
-    private val mMaxSize = 5 // 10
+    private val mMaxSize = 4 // 10
     private var userID = 0
 
     private var mCurrIndex = 0
@@ -84,6 +86,15 @@ class Title : Fragment(), CardStackListener {
         // has login data
         else {
 
+            loadButton = view.findViewById<Button>(R.id.loadRecoMovies_bts)
+
+            // reset
+            this.resetData(view)
+
+            view.findViewById<Button>(R.id.loadRecoMovies_bts).setOnClickListener {
+                Toast.makeText(view.context, loadButton.contentDescription, Toast.LENGTH_LONG).show()
+            }
+
             // show the bottom navigation
             (activity as MainActivity).setBottomNavigationVisibility(View.VISIBLE)
 
@@ -103,6 +114,9 @@ class Title : Fragment(), CardStackListener {
                             is Result.Success -> {
                                 val data = result.get()
                                 Log.v(TAG, "Success: $data")
+
+                                // buttons
+                                view.findViewById<Button>(R.id.loadRecoMoviesDummy_bts).visibility = View.VISIBLE
 
                                 val jsonArray = JSONArray(data);
                                 // init the card data (until mMaxSize or jsonArray.length())
@@ -198,18 +212,20 @@ class Title : Fragment(), CardStackListener {
         // last position reached, do something
         if (manager.topPosition == viewAdapter.itemCount) {
 
+            loadButton.visibility = View.VISIBLE
+
             // Liked Movie IDs
             var movieLikedIDs = ""
                 for(i in 0 until mLikedIndex)
-                    movieLikedIDs += "&movie_id=" + mLikedCards[i].toString()
+                    movieLikedIDs += "&movie_id_like=" + mLikedCards[i].toString()
 
             // Hate Movie IDs
             var movieHateIDs = ""
             for(i in 0 until mHateIndex)
-                movieHateIDs += "&movie_id=" + mHateCards[i].toString()
+                movieHateIDs += "&movie_id_hate=" + mHateCards[i].toString()
 
             // HTTP REQUEST POST
-            (getString(R.string.url_main) + "ratings?user_id=").plus(userID.toString()).plus(movieLikedIDs)
+            (getString(R.string.url_main) + "ratings?user_id=").plus(userID.toString()).plus(movieLikedIDs).plus(movieHateIDs)
                 .httpPost()
                 .authentication()
                 .also { Log.d(TAG, it.cUrlString()) }
@@ -248,30 +264,37 @@ class Title : Fragment(), CardStackListener {
     override fun onCardDisappeared(view: View, position: Int) {
     }
 
-    fun resetData() {
+    private fun resetData(view : View) {
         mCurrIndex = 0
         mCards = arrayOfNulls<CardMovie>(mMaxSize)
         mLikedCards = arrayOfNulls<String>(mMaxSize)
         mLikedIndex = 0
         mHateCards = arrayOfNulls<String>(mMaxSize)
         mHateIndex = 0
+
+        view.findViewById<Button>(R.id.loadRecoMovies_bts).visibility = View.INVISIBLE
+        view.findViewById<Button>(R.id.loadRecoMoviesDummy_bts).visibility = View.INVISIBLE
+    }
+
+    private fun loadData(view : View) {
+
     }
 }
 
-private val listOfMovies = listOf(
-        R.drawable.movie_post_1,
-        R.drawable.movie_post_2,
-        R.drawable.movie_post_3,
-        R.drawable.movie_post_4,
-        R.drawable.movie_post_5,
-        R.drawable.movie_post_6
-)
-
-private var listOfTitles = arrayOf(
-        "Moonlight",
-        "Joker",
-        "Kong: Skull Island",
-        "The Nightingale",
-        "Spider-Man: Into the Spider-Verse",
-        "The Assassin"
-)
+//private val listOfMovies = listOf(
+//        R.drawable.movie_post_1,
+//        R.drawable.movie_post_2,
+//        R.drawable.movie_post_3,
+//        R.drawable.movie_post_4,
+//        R.drawable.movie_post_5,
+//        R.drawable.movie_post_6
+//)
+//
+//private var listOfTitles = arrayOf(
+//        "Moonlight",
+//        "Joker",
+//        "Kong: Skull Island",
+//        "The Nightingale",
+//        "Spider-Man: Into the Spider-Verse",
+//        "The Assassin"
+//)

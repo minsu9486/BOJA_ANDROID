@@ -74,7 +74,7 @@ dependencies {
     implementation 'com.yuyakaido.android:card-stack-view:2.3.4'
     implementation 'com.squareup.picasso:picasso:2.8'
 
-    // Login
+    // HTTP Request
     implementation 'com.github.kittinunf.fuel:fuel:2.3.1'
     implementation 'com.github.kittinunf.fuel:fuel-android:2.3.1'
 }

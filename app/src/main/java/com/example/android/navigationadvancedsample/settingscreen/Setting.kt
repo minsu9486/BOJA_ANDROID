@@ -25,7 +25,6 @@ class Setting : Fragment()
 
         val view = inflater.inflate(R.layout.fragment_setting, container, false);
 
-
         view.findViewById<Button>(R.id.signoff_btn).setOnClickListener {
 
             val sharedPref = activity?.getSharedPreferences("LoginStatus", Context.MODE_PRIVATE)
