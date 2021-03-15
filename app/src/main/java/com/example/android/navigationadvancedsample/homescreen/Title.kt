@@ -23,6 +23,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.ImageView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
@@ -86,6 +87,8 @@ class Title : Fragment(), CardStackListener {
         // has login data
         else {
 
+            (activity as MainActivity).setProgressIndicator(view, true)
+
             loadButton = view.findViewById<Button>(R.id.loadRecoMovies_bts)
 
             // reset
@@ -108,15 +111,25 @@ class Title : Fragment(), CardStackListener {
                                 val data = result.error.errorData.toString(Charsets.UTF_8)
                                 Log.v(TAG, "Failure, ErrorData: $data")
 
-                                val message = JSONObject(data).getString("message")?:"Error"
+                                (activity as MainActivity).setProgressIndicator(view, false)
+
+                                var message = if(data != "")
+                                    JSONObject(data).getString("message")?:"Error"
+                                else
+                                    "Error"
+
                                 Toast.makeText(view.context, message, Toast.LENGTH_LONG).show()
                             }
                             is Result.Success -> {
                                 val data = result.get()
                                 Log.v(TAG, "Success: $data")
 
+                                (activity as MainActivity).setProgressIndicator(view, false)
+
                                 // buttons
                                 view.findViewById<Button>(R.id.loadRecoMoviesDummy_bts).visibility = View.VISIBLE
+                                view.findViewById<ImageView>(R.id.deco_thumbDown_bts).visibility = View.VISIBLE
+                                view.findViewById<ImageView>(R.id.deco_thumbUp_bts).visibility = View.VISIBLE
 
                                 val jsonArray = JSONArray(data);
                                 // init the card data (until mMaxSize or jsonArray.length())
@@ -274,6 +287,8 @@ class Title : Fragment(), CardStackListener {
 
         view.findViewById<Button>(R.id.loadRecoMovies_bts).visibility = View.INVISIBLE
         view.findViewById<Button>(R.id.loadRecoMoviesDummy_bts).visibility = View.INVISIBLE
+        view.findViewById<ImageView>(R.id.deco_thumbDown_bts).visibility = View.INVISIBLE
+        view.findViewById<ImageView>(R.id.deco_thumbUp_bts).visibility = View.INVISIBLE
     }
 
     private fun loadData(view : View) {

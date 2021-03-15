@@ -164,7 +164,7 @@ class MyAdapter(private val myDataset: Array<CardMovie?>, private val itemCount:
 
         if(holder.itemViewType == TYPE_ITEM) {
             holder.item.findViewById<ImageView>(R.id.user_avatar_image)
-                    .setImageResource(R.drawable.movie_post_0)
+                    .setImageResource(R.drawable.movie_post_error)
 
             holder.item.findViewById<AppCompatTextView>(R.id.user_name_text).text = myDataset[position % itemCount]?.title
                     ?: "title uninit"

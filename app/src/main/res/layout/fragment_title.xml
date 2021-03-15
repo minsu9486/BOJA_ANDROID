@@ -47,4 +47,24 @@
         android:textSize="20sp"
         android:textStyle="bold" />
 
+    <ImageView
+        android:id="@+id/deco_thumbUp_bts"
+        android:layout_height="36dp"
+        android:layout_width="36dp"
+        android:layout_toLeftOf="@id/loadRecoMovies_bts"
+        android:layout_marginRight="36dp"
+        android:layout_centerInParent="true"
+        app:srcCompat="@drawable/ic_thumb_down"
+        app:tint="@color/colorAccent"/>
+
+    <ImageView
+        android:id="@+id/deco_thumbDown_bts"
+        android:layout_height="36dp"
+        android:layout_width="36dp"
+        android:layout_toRightOf="@id/loadRecoMovies_bts"
+        android:layout_marginLeft="36dp"
+        android:layout_centerInParent="true"
+        app:srcCompat="@drawable/ic_thumb_up"
+        app:tint="@color/colorAccent" />
+
 </RelativeLayout>

@@ -59,7 +59,7 @@ class Register : Fragment() {
                 val message = "Please, fill the empty box."
                 Toast.makeText(view.context, message, Toast.LENGTH_LONG).show()
             }
-            else if (textPassword != textConfirmPassword){
+            else if (textPassword.toString() != textConfirmPassword.toString()){
                 val message = "Those passwords didn’t match. Try again."
                 Toast.makeText(view.context, message, Toast.LENGTH_LONG).show()
             }
