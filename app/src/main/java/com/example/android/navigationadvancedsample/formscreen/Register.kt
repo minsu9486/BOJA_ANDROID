@@ -16,6 +16,7 @@
 
 package com.example.android.navigationadvancedsample.formscreen
 
+import android.content.Context
 import android.os.Bundle
 import android.provider.SyncStateContract.Helpers.update
 import android.util.Log
@@ -88,6 +89,13 @@ class Register : Fragment() {
                                     Log.v(TAG, "Success: $data")
 
                                     (activity as MainActivity).setProgressIndicator(view, false)
+
+                                    val userID = JSONObject(data).getInt("user_id");
+
+                                    val sharedPref = activity?.getSharedPreferences("LoginStatus", Context.MODE_PRIVATE)
+                                    sharedPref?.edit()?.putInt("user_id", userID)?.apply()
+                                    sharedPref?.edit()?.putBoolean("DidLogIn", true)?.apply()
+                                    sharedPref?.edit()?.putString("user_name", textUsername.toString())?.apply()
 
                                     findNavController().navigate(R.id.action_register_to_registered)
                                 }
