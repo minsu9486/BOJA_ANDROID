@@ -248,8 +248,10 @@ class Title : Fragment(), CardStackListener {
                             val data = result.error.errorData.toString(Charsets.UTF_8)
                             Log.v(TAG, "Failure, ErrorData: $data")
 
-                            val message = JSONObject(data).getString("message")?:"Error"
-                            Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show()
+                            var message = if(data != "")
+                                JSONObject(data).getString("message")?:"Error"
+                            else
+                                "Error"
                         }
                         is Result.Success -> {
                             val data = result.get()

@@ -31,9 +31,9 @@
         android:id="@+id/user_avatar_image"
         android:layout_width="150dp"
         android:layout_height="200dp"
-        app:srcCompat="@drawable/circle"
-        tools:srcCompat="@drawable/circle"
-        android:contentDescription="@string/profile_image"/>
+        android:contentDescription="@string/profile_image"
+        android:scaleType="centerCrop"
+        app:srcCompat="@drawable/movie_post_error"/>
 
     <TextView
         android:id="@+id/user_name_text"
@@ -42,7 +42,7 @@
         android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
         android:textSize="16sp"
         android:textColor="@android:color/black"
-        tools:text="title uninit -----------------------------"
+        tools:text="Empty"
         android:layout_marginLeft="8dp" />
 
 <!--    <TextView-->

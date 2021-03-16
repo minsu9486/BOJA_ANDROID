@@ -22,7 +22,19 @@
     android:id="@+id/layout_leaderboard"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical" >
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/user_name_text"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="8dp"
+        android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:textColor="@android:color/black"
+
+        tools:text="User Name"/>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/leaderboard_list"
@@ -32,10 +44,6 @@
         android:padding="8dp"
         android:clipToPadding="false"
         android:orientation="horizontal"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
         tools:context="com.example.android.navigationadvancedsample.listscreen.Leaderboard"
         tools:listitem="@layout/list_view_item"/>
 

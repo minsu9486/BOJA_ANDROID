@@ -65,6 +65,7 @@ class SignIn : Fragment() {
                                 val sharedPref = activity?.getSharedPreferences("LoginStatus", Context.MODE_PRIVATE)
                                 sharedPref?.edit()?.putInt("user_id", userID)?.apply()
                                 sharedPref?.edit()?.putBoolean("DidLogIn", true)?.apply()
+                                sharedPref?.edit()?.putString("user_name", textUsername.toString())?.apply()
 
                                 findNavController().navigate(R.id.action_signIn_to_registered)
                             }

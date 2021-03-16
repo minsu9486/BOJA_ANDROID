@@ -49,6 +49,8 @@ data class CardMovie(var index: Int?, var id: String?, var title: String?, var g
 
 class CardAdapter(private val myDataset: Array<CardMovie?>, private val itemCount: Int) : RecyclerView.Adapter<CardAdapter.CardViewHolder>() {
 
+    private val picasso: Picasso = Picasso.get()
+
     class CardViewHolder(var view: View) : RecyclerView.ViewHolder(view) {
     }
 
@@ -59,13 +61,13 @@ class CardAdapter(private val myDataset: Array<CardMovie?>, private val itemCoun
 
     override fun onBindViewHolder(viewHolder: CardViewHolder, position: Int) {
 
-        val picasso = Picasso.get()
-
         val movieTitle = myDataset[position % itemCount]?.title?: "NoImage"
+        viewHolder.view.findViewById<AppCompatTextView>(R.id.card_movie_title).text = movieTitle
+
         // https://docs.microsoft.com/en-us/bing/search-apis/bing-image-search/reference/query-parameters
         val searchOptions = "&count=1" + "&aspect=Tall" + "&size=Medium"
 
-        (viewHolder.view.context as MainActivity).setProgressIndicator(viewHolder.view, true)
+//        (viewHolder.view.context as MainActivity).setProgressIndicator(viewHolder.view, true)
 
         // https://docs.microsoft.com/en-us/bing/search-apis/bing-image-search/reference/endpoints
         (viewHolder.view.context.getString(R.string.Azure_Search_URL) + "?q=" + movieTitle + searchOptions)
@@ -77,13 +79,13 @@ class CardAdapter(private val myDataset: Array<CardMovie?>, private val itemCoun
 //                            val data = result
                             println(result)
 
-                            (viewHolder.view.context as MainActivity).setProgressIndicator(viewHolder.view, false)
+//                            (viewHolder.view.context as MainActivity).setProgressIndicator(viewHolder.view, false)
                         }
                         is Result.Success -> {
                             val data = result.get()
                             Log.v("CardMovie", data)
 
-                            (viewHolder.view.context as MainActivity).setProgressIndicator(viewHolder.view, false)
+//                            (viewHolder.view.context as MainActivity).setProgressIndicator(viewHolder.view, false)
 
                             // https://docs.microsoft.com/en-us/bing/search-apis/bing-image-search/reference/response-objects#imageanswer
                             val imageData = JSONObject(data).getJSONArray("value").getJSONObject(0);
@@ -100,8 +102,6 @@ class CardAdapter(private val myDataset: Array<CardMovie?>, private val itemCoun
 
 //                            viewHolder.view.findViewById<ImageView>(R.id.card_movie_image)
 //                                    .setImageResource(listOfColdMovie[position % itemCount])
-
-                            viewHolder.view.findViewById<AppCompatTextView>(R.id.card_movie_title).text = movieTitle
                         }
                     }
                 }
