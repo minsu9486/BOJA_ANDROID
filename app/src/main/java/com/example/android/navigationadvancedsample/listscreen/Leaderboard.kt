@@ -163,7 +163,6 @@ class MyAdapter(private val view : View, private val userID : Int, private val m
 
     private val picasso: Picasso = Picasso.get()
     private val loadNum = 4
-    private var currLoadCount = 0
 
     class ViewHolder(val item: View) : RecyclerView.ViewHolder(item)
 
@@ -250,7 +249,7 @@ class MyAdapter(private val view : View, private val userID : Int, private val m
 
         (view.context as MainActivity).setProgressIndicator(view, true)
 
-        val startRange = if (currLoadCount == 0) 0 else currLoadCount
+        val startRange = myDataset.size - 1
         val loadRange = "&start=" + startRange.toString() + "&end=" + (startRange + loadNum).toString()
 
         (view.context.getString(R.string.url_main) + "likedMovies?user_id=").plus(userID.toString()).plus(loadRange)
@@ -289,8 +288,6 @@ class MyAdapter(private val view : View, private val userID : Int, private val m
                             }
 
                             this.notifyDataSetChanged() // update
-
-                            currLoadCount += jsonArray.length()
                         }
                     }
                 }

@@ -117,16 +117,16 @@ class CardAdapter(private val myDataset: Array<CardMovie?>, private val itemCoun
         return itemCount
     }
 }
-
-private val listOfColdMovie = listOf(
-        R.drawable.movie_post_cold_1,
-        R.drawable.movie_post_cold_2,
-        R.drawable.movie_post_cold_3,
-        R.drawable.movie_post_cold_4,
-        R.drawable.movie_post_cold_5,
-        R.drawable.movie_post_cold_6,
-        R.drawable.movie_post_cold_7,
-        R.drawable.movie_post_cold_8,
-        R.drawable.movie_post_cold_9,
-        R.drawable.movie_post_cold_10
-)
+//
+//private val listOfColdMovie = listOf(
+//        R.drawable.movie_post_cold_1,
+//        R.drawable.movie_post_cold_2,
+//        R.drawable.movie_post_cold_3,
+//        R.drawable.movie_post_cold_4,
+//        R.drawable.movie_post_cold_5,
+//        R.drawable.movie_post_cold_6,
+//        R.drawable.movie_post_cold_7,
+//        R.drawable.movie_post_cold_8,
+//        R.drawable.movie_post_cold_9,
+//        R.drawable.movie_post_cold_10
+//)
