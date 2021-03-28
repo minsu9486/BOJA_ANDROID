@@ -50,7 +50,7 @@ class Leaderboard : Fragment() {
     val TAG = MainActivity::class.java.simpleName
 
     private var userID = 0
-    private var mCards = mutableListOf<CardMovie>(CardMovie(0, "", "", ""))
+    private var mCards = mutableListOf<CardMovie>(CardMovie(0, "", "", "", ""))
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -59,73 +59,15 @@ class Leaderboard : Fragment() {
         val sharedPref = activity?.getSharedPreferences("LoginStatus", Context.MODE_PRIVATE)
         userID = sharedPref?.getInt("user_id", 0)!!
 
+        // first attempt, clear mCards
+        if(mCards[mCards.size - 1].id != userID.toString()) {
+            mCards = mutableListOf<CardMovie>(CardMovie(0, "", "", "", ""))
+            mCards[mCards.size - 1].id = userID.toString()
+        }
+
 //        (activity as MainActivity).setProgressIndicator(view, true)
 
         view.findViewById<TextView>(R.id.user_name_text).text = sharedPref?.getString("user_name", "User Name")!! + "'s Liked Movies";
-
-
-
-//        val loadRange = "&start=" + currLoadCount.toString() + "&end=" + (currLoadCount + loadNum).toString()
-//        (getString(R.string.url_main) + "likedMovies?user_id=").plus(userID.toString()).plus(loadRange)
-////        (getString(R.string.url_main) + "recoMovies?user_id=").plus(userID.toString())
-//                .httpGet()
-//                .also { Log.d(TAG, it.cUrlString()) }
-//                .responseString { _, _, result ->
-//                    when (result) {
-//                        is Result.Failure -> {
-//                            val data = result.error
-//                            Log.v(TAG, "Failure, ErrorData: $data")
-//
-//                            (activity as MainActivity).setProgressIndicator(view, false)
-//
-//                            val message = result.error.message ?: "Error"
-//                            Toast.makeText(view.context, message, Toast.LENGTH_LONG).show()
-//                        }
-//                        is Result.Success -> {
-//                            val data = result.get()
-//                            println(data)
-//                            Log.v(TAG, "Success: $data")
-//
-//                            (activity as MainActivity).setProgressIndicator(view, false)
-//
-//                            // load and init the card data
-//                            val jsonArray = JSONArray(data);
-////                            mMaxSize = minOf(mMaxSize, jsonArray.length());
-//                            for (i in 0 until jsonArray.length()) {
-//                                mCards.add(CardMovie(
-//                                        i,
-//                                        jsonArray.getJSONObject(i).getString("movie_id"),
-//                                        jsonArray.getJSONObject(i).getString("title"),
-//                                        jsonArray.getJSONObject(i).getString("genres"),
-//                                ))
-//                            }
-//
-////                            // Grid type of RecyclerView
-////                            val viewAdapter = MyAdapter(mCards, mMaxSize)
-////                            val recyclerView = view.findViewById<RecyclerView>(R.id.leaderboard_list);
-////
-////                            val gridSpandCount = 2
-////                            val gridManager = GridLayoutManager(activity, gridSpandCount, GridLayoutManager.VERTICAL, false)
-////                            gridManager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
-////                                override fun getSpanSize(position: Int) =  when (position) {
-////                                    mMaxSize -> gridSpandCount // the last item: button
-////                                    else -> 1
-////                                }
-////                            }
-////
-////                            recyclerView.layoutManager = gridManager
-////                            recyclerView.run {
-////                                // use this setting to improve performance if you know that changes
-////                                // in content do not change the layout size of the RecyclerView
-////                                setHasFixedSize(true)
-////
-////                                // specify an viewAdapter (see also next example)
-////                                adapter = viewAdapter
-////                            }
-//
-//                        }
-//                    }
-//                }
 
         // Grid type of RecyclerView
         val viewAdapter = MyAdapter(view, userID, mCards)
@@ -200,6 +142,15 @@ class MyAdapter(private val view : View, private val userID : Int, private val m
             val movieTitle = myDataset[position % itemCount]?.title?: "NoTitle"
             holder.item.findViewById<AppCompatTextView>(R.id.user_name_text).text = movieTitle
 
+            // if there is a saved URL, load it
+            if(myDataset[position % itemCount]?.imageURL != "") {
+                picasso.load(myDataset[position % itemCount]?.imageURL)
+                        .error(R.drawable.movie_post_error)
+                        .into(holder.itemView.findViewById<ImageView>(R.id.card_movie_image))
+
+                return
+            }
+
             // https://docs.microsoft.com/en-us/bing/search-apis/bing-image-search/reference/query-parameters
             val searchOptions = "&count=1" + "&aspect=Tall" + "&size=Medium"
 
@@ -229,6 +180,7 @@ class MyAdapter(private val view : View, private val userID : Int, private val m
 
                                 holder.itemView.findViewById<ImageView>(R.id.user_avatar_image).setBackgroundColor(Color.parseColor("#$accentColor"))
 
+                                myDataset[position % itemCount]?.imageURL = thumbnailUrl // save the searched URL
                                 picasso.load(thumbnailUrl)
 //                                    .placeholder(R.drawable.movie_post_0) // replaced "movie_post_0" to the given "accentColor"
                                         .error(R.drawable.movie_post_error)
@@ -280,10 +232,11 @@ class MyAdapter(private val view : View, private val userID : Int, private val m
                             for (i in 0 until jsonArray.length()) {
                                 myDataset.add(myDataset.size - 1,
                                         CardMovie(
-                                            i,
-                                            jsonArray.getJSONObject(i).getString("movie_id"),
-                                            jsonArray.getJSONObject(i).getString("title"),
-                                            jsonArray.getJSONObject(i).getString("genres"),
+                                                i,
+                                                jsonArray.getJSONObject(i).getString("movie_id"),
+                                                jsonArray.getJSONObject(i).getString("title"),
+                                                jsonArray.getJSONObject(i).getString("genres"),
+                                                ""
                                         ))
                             }
 

@@ -86,13 +86,12 @@ class Title : Fragment(), CardStackListener {
         }
         // has login data
         else {
-
-            (activity as MainActivity).setProgressIndicator(view, true)
-
             loadButton = view.findViewById<Button>(R.id.loadRecoMovies_bts)
 
-            // reset
-            this.resetData(view)
+            view.findViewById<Button>(R.id.loadRecoMovies_bts).visibility = View.INVISIBLE
+            view.findViewById<Button>(R.id.loadRecoMoviesDummy_bts).visibility = View.INVISIBLE
+            view.findViewById<ImageView>(R.id.deco_thumbDown_bts).visibility = View.INVISIBLE
+            view.findViewById<ImageView>(R.id.deco_thumbUp_bts).visibility = View.INVISIBLE
 
             view.findViewById<Button>(R.id.loadRecoMovies_bts).setOnClickListener {
                 Toast.makeText(view.context, loadButton.contentDescription, Toast.LENGTH_LONG).show()
@@ -101,93 +100,64 @@ class Title : Fragment(), CardStackListener {
             // show the bottom navigation
             (activity as MainActivity).setBottomNavigationVisibility(View.VISIBLE)
 
-            userID = sharedPref?.getInt("user_id", 0)!!
-            (getString(R.string.url_main) + "starts?user_id=").plus(userID.toString())
-                    .httpGet()
-                    .also { Log.d(TAG, it.cUrlString()) }
-                    .responseString { _, _, result ->
-                        when (result) {
-                            is Result.Failure -> {
-                                val data = result.error.errorData.toString(Charsets.UTF_8)
-                                Log.v(TAG, "Failure, ErrorData: $data")
+            // only load a set of data when there is no data
+            if (mCards[0] != null) {
+                setCardLayout(view)
+            } else {
 
-                                (activity as MainActivity).setProgressIndicator(view, false)
+                (activity as MainActivity).setProgressIndicator(view, true)
 
-                                var message = if(data != "")
-                                    JSONObject(data).getString("message")?:"Error"
-                                else
-                                    "Error"
+                userID = sharedPref?.getInt("user_id", 0)!!
+                (getString(R.string.url_main) + "starts?user_id=").plus(userID.toString())
+                        .httpGet()
+                        .also { Log.d(TAG, it.cUrlString()) }
+                        .responseString { _, _, result ->
+                            when (result) {
+                                is Result.Failure -> {
+                                    val data = result.error.errorData.toString(Charsets.UTF_8)
+                                    Log.v(TAG, "Failure, ErrorData: $data")
 
-                                Toast.makeText(view.context, message, Toast.LENGTH_LONG).show()
-                            }
-                            is Result.Success -> {
-                                val data = result.get()
-                                Log.v(TAG, "Success: $data")
+                                    (activity as MainActivity).setProgressIndicator(view, false)
 
-                                (activity as MainActivity).setProgressIndicator(view, false)
+                                    var message = if (data != "")
+                                        JSONObject(data).getString("message") ?: "Error"
+                                    else
+                                        "Error"
 
-                                // buttons
-                                view.findViewById<Button>(R.id.loadRecoMoviesDummy_bts).visibility = View.VISIBLE
-                                view.findViewById<ImageView>(R.id.deco_thumbDown_bts).visibility = View.VISIBLE
-                                view.findViewById<ImageView>(R.id.deco_thumbUp_bts).visibility = View.VISIBLE
-
-                                val jsonArray = JSONArray(data);
-                                // init the card data (until mMaxSize or jsonArray.length())
-                                for (i in 0 until mMaxSize) {
-                                    mCards[i] = CardMovie(
-                                            i,
-                                            jsonArray.getJSONObject(i).getString("movieId"),
-                                            jsonArray.getJSONObject(i).getString("title"),
-                                            jsonArray.getJSONObject(i).getString("genres"),
-                                    );
+                                    Toast.makeText(view.context, message, Toast.LENGTH_LONG).show()
                                 }
+                                is Result.Success -> {
+                                    val data = result.get()
+                                    Log.v(TAG, "Success: $data")
 
-                                if(mCurrIndex == mMaxSize)
-                                    mCurrIndex = 0;
+                                    (activity as MainActivity).setProgressIndicator(view, false)
 
-                                manager = CardStackLayoutManager(this.context, this)
-                                viewAdapter = CardAdapter(mCards, mMaxSize)
+                                    // buttons
+                                    view.findViewById<Button>(R.id.loadRecoMoviesDummy_bts).visibility = View.VISIBLE
+                                    view.findViewById<ImageView>(R.id.deco_thumbDown_bts).visibility = View.VISIBLE
+                                    view.findViewById<ImageView>(R.id.deco_thumbUp_bts).visibility = View.VISIBLE
 
-                                view.findViewById<RecyclerView>(R.id.cardstack_list).run {
-                                    // use this setting to improve performance if you know that changes
-                                    // in content do not change the layout size of the RecyclerView
-                                    setHasFixedSize(true)
+                                    val jsonArray = JSONArray(data);
+                                    // init the card data (until mMaxSize or jsonArray.length())
+                                    for (i in 0 until mMaxSize) {
+                                        mCards[i] = CardMovie(
+                                                i,
+                                                jsonArray.getJSONObject(i).getString("movieId"),
+                                                jsonArray.getJSONObject(i).getString("title"),
+                                                jsonArray.getJSONObject(i).getString("genres"),
+                                                ""
+                                        );
+                                    }
 
-                                    manager.setDirections(arrayListOf(Direction.Right, Direction.Left))
-                                    manager.setCanScrollHorizontal(true)
-                                    manager.setVisibleCount(5)
-                                    manager.setStackFrom(StackFrom.Bottom)
-                                    manager.setTranslationInterval(6.0f)
-                                    manager.setScaleInterval(0.95f)
-                                    manager.setMaxDegree(20.0f)
-                                    manager.topPosition = mCurrIndex;
-
-                                    layoutManager = manager
-                                    adapter = viewAdapter // specify an viewAdapter (see also next example)
+                                    if (mCurrIndex == mMaxSize)
+                                        mCurrIndex = 0;
                                 }
-
                             }
                         }
-                    }
+
+                setCardLayout(view)
+            }
         }
-
-//        if(mCurrIndex == mMaxSize)
-//            mCurrIndex = 0;
-//
-//        // init the card data
-//        for (i in listOfTitles.indices) {
-//            mCards[i] = CardMovie(i, listOfTitles[i]);
-//        }
-
-//        view.findViewById<Button>(R.id.about_btn).setOnClickListener {
-//            findNavController().navigate(R.id.action_title_to_about)
-//        }
-
-//        // when pressed back button
-//        val callback = requireActivity().onBackPressedDispatcher.addCallback(this) {
-//            // Handle the back button event
-//            exitProcess(0)
-//        }
 
         return view
     }
@@ -261,6 +231,9 @@ class Title : Fragment(), CardStackListener {
                         }
                     }
                 }
+
+//            // reset
+//            resetData()
         }
 
         // save the current position
@@ -293,25 +266,30 @@ class Title : Fragment(), CardStackListener {
         view.findViewById<ImageView>(R.id.deco_thumbUp_bts).visibility = View.INVISIBLE
     }
 
-    private fun loadData(view : View) {
+//    private fun loadData(view : View) {
+//
+//    }
 
+    private fun setCardLayout (view : View) {
+        manager = CardStackLayoutManager(this.context, this)
+        viewAdapter = CardAdapter(mCards, mMaxSize)
+
+        view.findViewById<RecyclerView>(R.id.cardstack_list).run {
+            // use this setting to improve performance if you know that changes
+            // in content do not change the layout size of the RecyclerView
+            setHasFixedSize(true)
+
+            manager.setDirections(arrayListOf(Direction.Right, Direction.Left))
+            manager.setCanScrollHorizontal(true)
+            manager.setVisibleCount(5)
+            manager.setStackFrom(StackFrom.Bottom)
+            manager.setTranslationInterval(6.0f)
+            manager.setScaleInterval(0.95f)
+            manager.setMaxDegree(20.0f)
+            manager.topPosition = mCurrIndex;
+
+            layoutManager = manager
+            adapter = viewAdapter // specify an viewAdapter (see also next example)
+        }
     }
 }
-
-//private val listOfMovies = listOf(
-//        R.drawable.movie_post_1,
-//        R.drawable.movie_post_2,
-//        R.drawable.movie_post_3,
-//        R.drawable.movie_post_4,
-//        R.drawable.movie_post_5,
-//        R.drawable.movie_post_6
-//)
-//
-//private var listOfTitles = arrayOf(
-//        "Moonlight",
-//        "Joker",
-//        "Kong: Skull Island",
-//        "The Nightingale",
-//        "Spider-Man: Into the Spider-Verse",
-//        "The Assassin"
-//)

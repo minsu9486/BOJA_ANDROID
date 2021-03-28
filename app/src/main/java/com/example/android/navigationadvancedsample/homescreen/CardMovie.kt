@@ -17,9 +17,11 @@ import com.github.kittinunf.result.Result
 import com.squareup.picasso.Picasso
 import org.json.JSONObject
 
-data class CardMovie(var index: Int?, var id: String?, var title: String?, var genre: String?): Parcelable {
+data class CardMovie(var index: Int?, var id: String?, var title: String?, var genre: String?, var imageURL: String?): Parcelable {
+
     constructor(parcel: Parcel) : this(
             parcel.readValue(Int::class.java.classLoader) as? Int,
+            parcel.readString(),
             parcel.readString(),
             parcel.readString(),
             parcel.readString()) {
@@ -30,6 +32,7 @@ data class CardMovie(var index: Int?, var id: String?, var title: String?, var g
         parcel.writeValue(id)
         parcel.writeString(title)
         parcel.writeString(genre)
+        parcel.writeString(imageURL)
     }
 
     override fun describeContents(): Int {
@@ -64,6 +67,15 @@ class CardAdapter(private val myDataset: Array<CardMovie?>, private val itemCoun
         val movieTitle = myDataset[position % itemCount]?.title?: "NoImage"
         viewHolder.view.findViewById<AppCompatTextView>(R.id.card_movie_title).text = movieTitle
 
+        // if there is a saved URL, load it
+        if(myDataset[position % itemCount]?.imageURL != "") {
+            picasso.load(myDataset[position % itemCount]?.imageURL)
+                    .error(R.drawable.movie_post_error)
+                    .into(viewHolder.view.findViewById<ImageView>(R.id.card_movie_image))
+
+            return
+        }
+
         // https://docs.microsoft.com/en-us/bing/search-apis/bing-image-search/reference/query-parameters
         val searchOptions = "&count=1" + "&aspect=Tall" + "&size=Medium"
 
@@ -95,6 +107,7 @@ class CardAdapter(private val myDataset: Array<CardMovie?>, private val itemCoun
 
                             viewHolder.view.findViewById<ImageView>(R.id.card_movie_image).setBackgroundColor(Color.parseColor("#$accentColor"))
 
+                            myDataset[position % itemCount]?.imageURL = thumbnailUrl // save the searched URL
                             picasso.load(thumbnailUrl)
 //                                    .placeholder(R.drawable.movie_post_0) // replaced "movie_post_0" to the given "accentColor"
                                     .error(R.drawable.movie_post_error)
@@ -117,16 +130,3 @@ class CardAdapter(private val myDataset: Array<CardMovie?>, private val itemCoun
         return itemCount
     }
 }
-//
-//private val listOfColdMovie = listOf(
-//        R.drawable.movie_post_cold_1,
-//        R.drawable.movie_post_cold_2,
-//        R.drawable.movie_post_cold_3,
-//        R.drawable.movie_post_cold_4,
-//        R.drawable.movie_post_cold_5,
-//        R.drawable.movie_post_cold_6,
-//        R.drawable.movie_post_cold_7,
-//        R.drawable.movie_post_cold_8,
-//        R.drawable.movie_post_cold_9,
-//        R.drawable.movie_post_cold_10
-//)
