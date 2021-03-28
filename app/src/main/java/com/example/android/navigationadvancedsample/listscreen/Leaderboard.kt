@@ -33,11 +33,13 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.android.navigationadvancedsample.MainActivity
 import com.example.android.navigationadvancedsample.R
+import com.example.android.navigationadvancedsample.homescreen.CardAdapter
 import com.example.android.navigationadvancedsample.homescreen.CardMovie
 import com.github.kittinunf.fuel.core.extensions.cUrlString
 import com.github.kittinunf.fuel.httpGet
 import com.github.kittinunf.result.Result
 import com.squareup.picasso.Picasso
+import com.yuyakaido.android.cardstackview.CardStackLayoutManager
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -49,6 +51,9 @@ class Leaderboard : Fragment() {
 
     val TAG = MainActivity::class.java.simpleName
 
+    private lateinit var manager: GridLayoutManager
+    private lateinit var viewAdapter: MyAdapter
+
     private var userID = 0
     private var mCards = mutableListOf<CardMovie>(CardMovie(0, "", "", "", ""))
 
@@ -59,7 +64,7 @@ class Leaderboard : Fragment() {
         val sharedPref = activity?.getSharedPreferences("LoginStatus", Context.MODE_PRIVATE)
         userID = sharedPref?.getInt("user_id", 0)!!
 
-        // first attempt, clear mCards
+        // if the client changed to a different account, clear mCards
         if(mCards[mCards.size - 1].id != userID.toString()) {
             mCards = mutableListOf<CardMovie>(CardMovie(0, "", "", "", ""))
             mCards[mCards.size - 1].id = userID.toString()
@@ -69,23 +74,53 @@ class Leaderboard : Fragment() {
 
         view.findViewById<TextView>(R.id.user_name_text).text = sharedPref?.getString("user_name", "User Name")!! + "'s Liked Movies";
 
-        // Grid type of RecyclerView
-        val viewAdapter = MyAdapter(view, userID, mCards)
+        setGridLayout(view)
+//        // Grid type of RecyclerView
+//        val viewAdapter = MyAdapter(view, userID, mCards)
+//        if (mCards.size == 1) // if empty
+//            viewAdapter.loadMore()
+//
+//        val recyclerView = view.findViewById<RecyclerView>(R.id.leaderboard_list);
+//
+//        val gridSpandCount = 2
+//        val gridManager = GridLayoutManager(activity, gridSpandCount, GridLayoutManager.VERTICAL, false)
+//        gridManager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
+//            override fun getSpanSize(position: Int) =  when (position) {
+//                (mCards.size - 1) -> gridSpandCount // the last item: button
+//                else -> 1
+//            }
+//        }
+//
+//        recyclerView.layoutManager = gridManager
+//        recyclerView.run {
+//            // use this setting to improve performance if you know that changes
+//            // in content do not change the layout size of the RecyclerView
+//            setHasFixedSize(true)
+//
+//            // specify an viewAdapter (see also next example)
+//            adapter = viewAdapter
+//        }
+
+        return view
+    }
+
+    private fun setGridLayout (view : View) {
+
+        viewAdapter = MyAdapter(view, userID, mCards)
         if (mCards.size == 1) // if empty
             viewAdapter.loadMore()
 
-        val recyclerView = view.findViewById<RecyclerView>(R.id.leaderboard_list);
-
         val gridSpandCount = 2
-        val gridManager = GridLayoutManager(activity, gridSpandCount, GridLayoutManager.VERTICAL, false)
-        gridManager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
+        manager = GridLayoutManager(activity, gridSpandCount, GridLayoutManager.VERTICAL, false)
+        manager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
             override fun getSpanSize(position: Int) =  when (position) {
                 (mCards.size - 1) -> gridSpandCount // the last item: button
                 else -> 1
             }
         }
 
-        recyclerView.layoutManager = gridManager
+        val recyclerView = view.findViewById<RecyclerView>(R.id.leaderboard_list);
+        recyclerView.layoutManager = manager
         recyclerView.run {
             // use this setting to improve performance if you know that changes
             // in content do not change the layout size of the RecyclerView
@@ -94,8 +129,6 @@ class Leaderboard : Fragment() {
             // specify an viewAdapter (see also next example)
             adapter = viewAdapter
         }
-
-        return view
     }
 
 }
@@ -146,7 +179,7 @@ class MyAdapter(private val view : View, private val userID : Int, private val m
             if(myDataset[position % itemCount]?.imageURL != "") {
                 picasso.load(myDataset[position % itemCount]?.imageURL)
                         .error(R.drawable.movie_post_error)
-                        .into(holder.itemView.findViewById<ImageView>(R.id.card_movie_image))
+                        .into(holder.itemView.findViewById<ImageView>(R.id.user_avatar_image))
 
                 return
             }
@@ -180,7 +213,7 @@ class MyAdapter(private val view : View, private val userID : Int, private val m
 
                                 holder.itemView.findViewById<ImageView>(R.id.user_avatar_image).setBackgroundColor(Color.parseColor("#$accentColor"))
 
-                                myDataset[position % itemCount]?.imageURL = thumbnailUrl // save the searched URL
+                                myDataset[position % itemCount]?.imageURL = thumbnailUrl // save the searched URL to not research it
                                 picasso.load(thumbnailUrl)
 //                                    .placeholder(R.drawable.movie_post_0) // replaced "movie_post_0" to the given "accentColor"
                                         .error(R.drawable.movie_post_error)
