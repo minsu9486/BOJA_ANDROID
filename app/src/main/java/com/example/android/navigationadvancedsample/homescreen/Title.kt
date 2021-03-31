@@ -153,9 +153,9 @@ class Title : Fragment(), CardStackListener {
                                         mCurrIndex = 0;
                                 }
                             }
-                        }
 
-                setCardLayout(view)
+                            setCardLayout(view)
+                        }
             }
         }
 
