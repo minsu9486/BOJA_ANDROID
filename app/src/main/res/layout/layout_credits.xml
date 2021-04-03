@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/layout_credits"
+    android:layout_width="375dp"
+    android:layout_height="wrap_content"
+    android:padding="12dp"
+    android:orientation="vertical"
+    android:background="@drawable/rounded_button">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Credits"
+        android:textSize="32dp"
+        android:gravity="center"
+        android:textStyle="bold"/>
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="16dp"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Team Redmond 2022"
+        android:textSize="22dp"
+        android:textStyle="bold"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:typeface="monospace"
+        android:text=" Back-End: Walt Cho"
+        android:textSize="18dp" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:typeface="monospace"
+        android:text="Front-End: Minsu Kang"
+        android:textSize="18dp" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Special thanks to Woonggi Eun (MIA)"
+        android:textSize="12dp"
+        android:gravity="center"/>
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="16dp"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Instructors"
+        android:textSize="22dp"
+        android:textStyle="bold"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Andrew Kaplan, Matthew Picioccio, Jen Sward"
+        android:textSize="16dp" />
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="16dp"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="President"
+        android:textSize="22dp"
+        android:textStyle="bold"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:typeface="monospace"
+        android:text="Claude Comair"
+        android:textSize="18dp" />
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="16dp"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Executives"
+        android:textSize="22dp"
+        android:textStyle="bold"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Jason Chu, Samir Abou Samra, Michele Comair, Angela Kugler, Erik Mohrmann, Benjamin Ellinger, Melvin Gonsalvez"
+        android:textSize="16dp" />
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="32dp"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="Copyright © 2021, Digipen Institute of Technology"
+        android:textSize="12dp" />
+
+</LinearLayout>

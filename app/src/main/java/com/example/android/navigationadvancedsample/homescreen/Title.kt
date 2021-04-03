@@ -17,6 +17,7 @@
 package com.example.android.navigationadvancedsample.homescreen
 
 import android.content.Context
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -24,6 +25,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageView
+import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
@@ -59,6 +61,7 @@ class Title : Fragment(), CardStackListener {
 
     private var mCurrIndex = 0
     private var mCards = arrayOfNulls<CardMovie>(mMaxSize)
+    private var isRecoType = false
 
     private var mLikedCards = arrayOfNulls<String>(mMaxSize)
     private var mLikedIndex = 0
@@ -71,6 +74,7 @@ class Title : Fragment(), CardStackListener {
 
         // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_title, container, false)
+        loadButton = view.findViewById<Button>(R.id.loadRecoMovies_bts)
 
         // get login data
         val sharedPref = activity?.getSharedPreferences("LoginStatus", Context.MODE_PRIVATE)
@@ -86,76 +90,29 @@ class Title : Fragment(), CardStackListener {
         }
         // has login data
         else {
-            loadButton = view.findViewById<Button>(R.id.loadRecoMovies_bts)
-
-            view.findViewById<Button>(R.id.loadRecoMovies_bts).visibility = View.INVISIBLE
-            view.findViewById<Button>(R.id.loadRecoMoviesDummy_bts).visibility = View.INVISIBLE
-            view.findViewById<ImageView>(R.id.deco_thumbDown_bts).visibility = View.INVISIBLE
-            view.findViewById<ImageView>(R.id.deco_thumbUp_bts).visibility = View.INVISIBLE
-
-            view.findViewById<Button>(R.id.loadRecoMovies_bts).setOnClickListener {
-                Toast.makeText(view.context, loadButton.contentDescription, Toast.LENGTH_LONG).show()
+            if (sharedPref == null) {
+                Toast.makeText(view.context, "Critical Error! NO SharedPref!", Toast.LENGTH_LONG).show()
+                return view
             }
 
             // show the bottom navigation
             (activity as MainActivity).setBottomNavigationVisibility(View.VISIBLE)
 
+            // button for "load more"
+            view.findViewById<Button>(R.id.loadRecoMovies_bts).setOnClickListener {
+                resetData()
+                initButtonState(view)
+                loadNewCards(view, sharedPref)
+            }
+
+            initButtonState(view)
+
             // only load a set of data when there is no data
             if (mCards[0] != null) {
+                activateButtonState(view)
                 setCardLayout(view)
             } else {
-
-                (activity as MainActivity).setProgressIndicator(view, true)
-
-                userID = sharedPref?.getInt("user_id", 0)!!
-                (getString(R.string.url_main) + "starts?user_id=").plus(userID.toString())
-                        .httpGet()
-                        .also { Log.d(TAG, it.cUrlString()) }
-                        .responseString { _, _, result ->
-                            when (result) {
-                                is Result.Failure -> {
-                                    val data = result.error.errorData.toString(Charsets.UTF_8)
-                                    Log.v(TAG, "Failure, ErrorData: $data")
-
-                                    (activity as MainActivity).setProgressIndicator(view, false)
-
-                                    var message = if (data != "")
-                                        JSONObject(data).getString("message") ?: "Error"
-                                    else
-                                        "Error"
-
-                                    Toast.makeText(view.context, message, Toast.LENGTH_LONG).show()
-                                }
-                                is Result.Success -> {
-                                    val data = result.get()
-                                    Log.v(TAG, "Success: $data")
-
-                                    (activity as MainActivity).setProgressIndicator(view, false)
-
-                                    // buttons
-                                    view.findViewById<Button>(R.id.loadRecoMoviesDummy_bts).visibility = View.VISIBLE
-                                    view.findViewById<ImageView>(R.id.deco_thumbDown_bts).visibility = View.VISIBLE
-                                    view.findViewById<ImageView>(R.id.deco_thumbUp_bts).visibility = View.VISIBLE
-
-                                    val jsonArray = JSONArray(data);
-                                    // init the card data (until mMaxSize or jsonArray.length())
-                                    for (i in 0 until mMaxSize) {
-                                        mCards[i] = CardMovie(
-                                                i,
-                                                jsonArray.getJSONObject(i).getString("movieId"),
-                                                jsonArray.getJSONObject(i).getString("title"),
-                                                jsonArray.getJSONObject(i).getString("genres"),
-                                                ""
-                                        );
-                                    }
-
-                                    if (mCurrIndex == mMaxSize)
-                                        mCurrIndex = 0;
-                                }
-                            }
-
-                            setCardLayout(view)
-                        }
+                loadNewCards(view, sharedPref)
             }
         }
 
@@ -231,9 +188,6 @@ class Title : Fragment(), CardStackListener {
                         }
                     }
                 }
-
-//            // reset
-//            resetData()
         }
 
         // save the current position
@@ -252,23 +206,92 @@ class Title : Fragment(), CardStackListener {
     override fun onCardDisappeared(view: View, position: Int) {
     }
 
-    private fun resetData(view : View) {
+    private fun resetData() {
         mCurrIndex = 0
         mCards = arrayOfNulls<CardMovie>(mMaxSize)
         mLikedCards = arrayOfNulls<String>(mMaxSize)
         mLikedIndex = 0
         mHateCards = arrayOfNulls<String>(mMaxSize)
         mHateIndex = 0
+    }
 
+    private fun initButtonState(view : View) {
         view.findViewById<Button>(R.id.loadRecoMovies_bts).visibility = View.INVISIBLE
         view.findViewById<Button>(R.id.loadRecoMoviesDummy_bts).visibility = View.INVISIBLE
         view.findViewById<ImageView>(R.id.deco_thumbDown_bts).visibility = View.INVISIBLE
         view.findViewById<ImageView>(R.id.deco_thumbUp_bts).visibility = View.INVISIBLE
     }
 
-//    private fun loadData(view : View) {
-//
-//    }
+    private fun activateButtonState(view : View) {
+        view.findViewById<Button>(R.id.loadRecoMoviesDummy_bts).visibility = View.VISIBLE
+        view.findViewById<ImageView>(R.id.deco_thumbDown_bts).visibility = View.VISIBLE
+        view.findViewById<ImageView>(R.id.deco_thumbUp_bts).visibility = View.VISIBLE
+
+        if(isRecoType)
+            view.findViewById<TextView>(R.id.data_type).text = "Ⓡ"
+        else
+            view.findViewById<TextView>(R.id.data_type).text = "Ⓒ"
+    }
+
+    private fun loadNewCards(view : View, sharedPref: SharedPreferences) {
+        (activity as MainActivity).setProgressIndicator(view, true)
+
+        userID = sharedPref?.getInt("user_id", 0)!!
+        (getString(R.string.url_main) + "starts?user_id=").plus(userID.toString())
+                .httpGet()
+                .also { Log.d(TAG, it.cUrlString()) }
+                .responseString { _, _, result ->
+                    when (result) {
+                        is Result.Failure -> {
+                            val data = result.error.errorData.toString(Charsets.UTF_8)
+                            Log.v(TAG, "Failure, ErrorData: $data")
+
+                            (activity as MainActivity).setProgressIndicator(view, false)
+
+                            var message = if (data != "")
+                                JSONObject(data).getString("message") ?: "Error"
+                            else
+                                "Error"
+
+                            Toast.makeText(view.context, message, Toast.LENGTH_LONG).show()
+                        }
+                        is Result.Success -> {
+                            val data = result.get()
+                            Log.v(TAG, "Success: $data")
+
+                            (activity as MainActivity).setProgressIndicator(view, false)
+
+                            activateButtonState(view)
+
+                            val jsonBody = JSONObject(data)
+                            isRecoType = jsonBody.getBoolean("isReco")
+                            if(isRecoType)
+                                view.findViewById<TextView>(R.id.data_type).text = "Ⓡ"
+                            else
+                                view.findViewById<TextView>(R.id.data_type).text = "Ⓒ"
+
+                            // a set of movies
+                            val jsonArray = jsonBody.getJSONArray("data")
+                            // init the card data (until mMaxSize or jsonArray.length())
+                            for (i in 0 until jsonArray.length()) {
+                                val item = jsonArray.getJSONObject(i)
+                                mCards[i] = CardMovie(
+                                        i,
+                                        item.getString("movie_id"),
+                                        item.getString("title"),
+                                        item.getString("genres"),
+                                        ""
+                                );
+                            }
+
+                            if (mCurrIndex == mMaxSize)
+                                mCurrIndex = 0;
+                        }
+                    }
+
+                    setCardLayout(view)
+                }
+    }
 
     private fun setCardLayout (view : View) {
         manager = CardStackLayoutManager(this.context, this)
