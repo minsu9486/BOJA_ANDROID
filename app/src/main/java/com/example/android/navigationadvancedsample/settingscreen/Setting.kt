@@ -57,7 +57,8 @@ class Setting : Fragment()
             view.findViewById<ConstraintLayout>(R.id.constraintLayout_setting).alpha = 0.6F
 
             // show the credits
-            TransitionManager.beginDelayedTransition(container)
+            popupWindow.isOutsideTouchable = false
+            popupWindow.isFocusable = true // any unexpected action: close the credits
             popupWindow.showAtLocation(container, Gravity.CENTER, 0, 0)
         }
 
