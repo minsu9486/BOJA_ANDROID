@@ -16,6 +16,7 @@
 
 package com.example.android.navigationadvancedsample.homescreen
 
+import android.animation.ValueAnimator.INFINITE
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
@@ -23,6 +24,10 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.AccelerateInterpolator
+import android.view.animation.Animation
+import android.view.animation.AnimationSet
+import android.view.animation.ScaleAnimation
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
@@ -41,7 +46,6 @@ import com.yuyakaido.android.cardstackview.CardStackLayoutManager
 import com.yuyakaido.android.cardstackview.CardStackListener
 import com.yuyakaido.android.cardstackview.Direction
 import com.yuyakaido.android.cardstackview.StackFrom
-import org.json.JSONArray
 import org.json.JSONObject
 
 
@@ -107,12 +111,15 @@ class Title : Fragment(), CardStackListener {
 
             initButtonState(view)
 
-            // only load a set of data when there is no data
+            // if there is a prev data...
             if (mCards[0] != null) {
                 activateButtonState(view)
                 setCardLayout(view)
-            } else {
-                loadNewCards(view, sharedPref)
+            }
+            // if it is the FIRST attempt...
+            else {
+                loadNewCards(view, sharedPref) // only load a set of data when there is no data
+//                onboardingAnimation(view)
             }
         }
 
@@ -175,8 +182,8 @@ class Title : Fragment(), CardStackListener {
                             val data = result.error.errorData.toString(Charsets.UTF_8)
                             Log.v(TAG, "Failure, ErrorData: $data")
 
-                            var message = if(data != "")
-                                JSONObject(data).getString("message")?:"Error"
+                            var message = if (data != "")
+                                JSONObject(data).getString("message") ?: "Error"
                             else
                                 "Error"
                         }
@@ -215,14 +222,14 @@ class Title : Fragment(), CardStackListener {
         mHateIndex = 0
     }
 
-    private fun initButtonState(view : View) {
+    private fun initButtonState(view: View) {
         view.findViewById<Button>(R.id.loadRecoMovies_bts).visibility = View.INVISIBLE
         view.findViewById<Button>(R.id.loadRecoMoviesDummy_bts).visibility = View.INVISIBLE
         view.findViewById<ImageView>(R.id.deco_thumbDown_bts).visibility = View.INVISIBLE
         view.findViewById<ImageView>(R.id.deco_thumbUp_bts).visibility = View.INVISIBLE
     }
 
-    private fun activateButtonState(view : View) {
+    private fun activateButtonState(view: View) {
         view.findViewById<Button>(R.id.loadRecoMoviesDummy_bts).visibility = View.VISIBLE
         view.findViewById<ImageView>(R.id.deco_thumbDown_bts).visibility = View.VISIBLE
         view.findViewById<ImageView>(R.id.deco_thumbUp_bts).visibility = View.VISIBLE
@@ -233,7 +240,36 @@ class Title : Fragment(), CardStackListener {
             view.findViewById<TextView>(R.id.data_type).text = "Ⓒ"
     }
 
-    private fun loadNewCards(view : View, sharedPref: SharedPreferences) {
+    private fun onboardingAnimation(view: View) {
+        val expandAndShrink = AnimationSet(true)
+
+        val expand = ScaleAnimation(
+                1f, 1.5f,
+                1f, 1.5f,
+                Animation.RELATIVE_TO_SELF, 0.5f,
+                Animation.RELATIVE_TO_SELF, 0.5f)
+        expand.duration = 1000
+
+        val shrink = ScaleAnimation(
+                1.5f, 1f,
+                1.5f, 1f,
+                Animation.RELATIVE_TO_SELF, 0.5f,
+                Animation.RELATIVE_TO_SELF, 0.5f)
+        shrink.startOffset = 1000
+        shrink.duration = 1000
+
+        expandAndShrink.addAnimation(expand)
+        expandAndShrink.addAnimation(shrink)
+        expandAndShrink.fillAfter = true
+        expandAndShrink.interpolator = AccelerateInterpolator(1.0f)
+//        expandAndShrink.repeatCount = INFINITE
+//        expandAndShrink.startOffset = 1000
+
+        view.findViewById<ImageView>(R.id.deco_thumbDown_bts).animation = expandAndShrink
+        view.findViewById<ImageView>(R.id.deco_thumbDown_bts).animate()
+    }
+
+    private fun loadNewCards(view: View, sharedPref: SharedPreferences) {
         (activity as MainActivity).setProgressIndicator(view, true)
 
         userID = sharedPref?.getInt("user_id", 0)!!
@@ -265,7 +301,7 @@ class Title : Fragment(), CardStackListener {
 
                             val jsonBody = JSONObject(data)
                             isRecoType = jsonBody.getBoolean("isReco")
-                            if(isRecoType)
+                            if (isRecoType)
                                 view.findViewById<TextView>(R.id.data_type).text = "Ⓡ"
                             else
                                 view.findViewById<TextView>(R.id.data_type).text = "Ⓒ"
@@ -293,7 +329,7 @@ class Title : Fragment(), CardStackListener {
                 }
     }
 
-    private fun setCardLayout (view : View) {
+    private fun setCardLayout(view: View) {
         manager = CardStackLayoutManager(this.context, this)
         viewAdapter = CardAdapter(mCards, mMaxSize)
 
@@ -313,6 +349,9 @@ class Title : Fragment(), CardStackListener {
 
             layoutManager = manager
             adapter = viewAdapter // specify an viewAdapter (see also next example)
+
+            if (manager.topPosition == viewAdapter.itemCount)
+                loadButton.visibility = View.VISIBLE
         }
     }
 }
