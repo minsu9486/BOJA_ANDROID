@@ -37,6 +37,7 @@ import android.view.WindowManager
 class MainActivity : AppCompatActivity() {
 
     var currentNavController: LiveData<NavController>? = null
+    var isFirstAttempt = false
     lateinit var bottomNavigationView: BottomNavigationView
     lateinit var progressIndicator: CircularProgressIndicator
 

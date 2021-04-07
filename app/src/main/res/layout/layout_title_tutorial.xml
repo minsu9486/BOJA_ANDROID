@@ -14,16 +14,14 @@
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
         android:background="@drawable/rounded_button"
-        android:contentDescription="load recommended movies"
         android:text="Get More Movies !"
-        android:textColor="@color/colorAccent"
         android:textSize="20sp"
         android:textStyle="bold"
         android:visibility="invisible"/>
 
     <!--    Onboarding Tutorial-->
     <ImageView
-        android:id="@+id/tuto_thumbUp_bts"
+        android:id="@+id/tuto_thumbDown_bts"
         android:layout_height="36dp"
         android:layout_width="36dp"
         android:layout_toLeftOf="@id/loadRecoMoviesDummy_bts"
@@ -32,8 +30,21 @@
         app:srcCompat="@drawable/ic_thumb_down"
         app:tint="@color/colorAccent"/>
 
+    <TextView
+        android:id="@+id/tuto_thumbDown_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/loadRecoMoviesDummy_bts"
+        android:layout_alignEnd="@+id/loadRecoMoviesDummy_bts"
+        android:layout_marginEnd="63dp"
+        android:layout_marginBottom="99dp"
+        android:text="Swipe left if you don't like"
+        android:textColor="@android:color/black"
+        android:textSize="20dp"
+        android:textStyle="bold" />
+
     <ImageView
-        android:id="@+id/tuto_thumbDown_bts"
+        android:id="@+id/tuto_thumbUp_bts"
         android:layout_height="36dp"
         android:layout_width="36dp"
         android:layout_toRightOf="@id/loadRecoMoviesDummy_bts"
@@ -41,5 +52,53 @@
         android:layout_centerInParent="true"
         app:srcCompat="@drawable/ic_thumb_up"
         app:tint="@color/colorAccent" />
+
+    <TextView
+        android:id="@+id/tuto_thumbUp_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/loadRecoMoviesDummy_bts"
+        android:layout_alignEnd="@+id/loadRecoMoviesDummy_bts"
+        android:layout_marginEnd="-48dp"
+        android:layout_marginBottom="99dp"
+        android:text="Swipe right if you like"
+        android:textColor="@android:color/black"
+        android:textSize="20dp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/tuto_end_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/loadRecoMoviesDummy_bts"
+        android:layout_alignEnd="@+id/loadRecoMoviesDummy_bts"
+        android:layout_marginEnd="71dp"
+        android:layout_marginBottom="99dp"
+        android:text="Enjoy!"
+        android:textColor="@android:color/black"
+        android:textSize="40dp"
+        android:textStyle="bold" />
+
+<!--    <ImageView-->
+<!--        android:id="@+id/tuto_restart_btn"-->
+<!--        android:layout_width="48dp"-->
+<!--        android:layout_height="48dp"-->
+<!--        android:layout_alignStart="@+id/loadRecoMoviesDummy_bts"-->
+<!--        android:layout_alignBottom="@+id/loadRecoMoviesDummy_bts"-->
+<!--        android:layout_marginStart="-64dp"-->
+<!--        android:layout_marginBottom="-279dp"-->
+<!--        app:srcCompat="@drawable/ic_refresh"-->
+<!--        app:tint="@color/colorAccent" />-->
+
+        <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/loadRecoMoviesDummy_bts"
+        android:layout_alignEnd="@+id/loadRecoMoviesDummy_bts"
+        android:layout_marginEnd="-62dp"
+        android:layout_marginBottom="-328dp"
+        android:text="Touch the screen to skip..."
+        android:textColor="@android:color/black"
+        android:textSize="16dp" />
 
 </RelativeLayout>

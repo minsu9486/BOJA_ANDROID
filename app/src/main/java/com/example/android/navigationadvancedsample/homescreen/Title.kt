@@ -16,11 +16,15 @@
 
 package com.example.android.navigationadvancedsample.homescreen
 
+import android.animation.ValueAnimator.INFINITE
+import android.animation.ValueAnimator.RESTART
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
 import android.view.*
+import android.view.animation.*
+import android.view.animation.Animation.RELATIVE_TO_SELF
 import android.widget.*
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
@@ -37,6 +41,7 @@ import com.yuyakaido.android.cardstackview.CardStackListener
 import com.yuyakaido.android.cardstackview.Direction
 import com.yuyakaido.android.cardstackview.StackFrom
 import org.json.JSONObject
+import kotlin.properties.Delegates
 
 
 /**
@@ -52,7 +57,6 @@ class Title : Fragment(), CardStackListener {
 
     private val mMaxSize = 4 // 10
     private var userID = 0
-    private var isFirstAttempt = false
 
     private var mCurrIndex = 0
     private var mCards = arrayOfNulls<CardMovie>(mMaxSize)
@@ -78,7 +82,7 @@ class Title : Fragment(), CardStackListener {
         // no login data
         if(didLogIn == false) {
 
-            isFirstAttempt = true
+            (activity as MainActivity).isFirstAttempt = true
 
             // hide the bottom navigation
             (activity as MainActivity).setBottomNavigationVisibility(View.INVISIBLE)
@@ -242,6 +246,27 @@ class Title : Fragment(), CardStackListener {
                 RelativeLayout.LayoutParams.MATCH_PARENT
         )
 
+//        // animation for the restart button
+//        var rotate = RotateAnimation(
+//                0f, 360f,
+//                RELATIVE_TO_SELF, 0.5f,
+//                RELATIVE_TO_SELF, 0.5f)
+//        rotate.repeatMode = RESTART
+//        rotate.repeatCount = INFINITE
+//        rotate.duration = 800
+//        rotate.startOffset = 500
+//        viewTutorial.findViewById<ImageView>(R.id.tuto_restart_btn).animation = rotate
+//        viewTutorial.findViewById<ImageView>(R.id.tuto_restart_btn).animate().start()
+//
+//        // restart the whole animation
+//        viewTutorial.findViewById<ImageView>(R.id.tuto_restart_btn).setOnTouchListener { _, event ->
+//            if (event.action == MotionEvent.ACTION_DOWN) {
+////                tutorialClearAnimation(viewTutorial)
+////                tutorialAnimation(viewTutorial, popupWindow)
+//            }
+//            true
+//        }
+
         // close the credits when a user touches the screen
         viewTutorial.findViewById<RelativeLayout>(R.id.layout_title_tutorial).setOnTouchListener { _, event ->
             if (event.action == MotionEvent.ACTION_DOWN) {
@@ -253,8 +278,7 @@ class Title : Fragment(), CardStackListener {
         //Set a dismiss listener for the credits
         popupWindow.setOnDismissListener {
 
-            viewTutorial.findViewById<ImageView>(R.id.tuto_thumbUp_bts).clearAnimation()
-            viewTutorial.findViewById<ImageView>(R.id.tuto_thumbDown_bts).clearAnimation()
+            tutorialClearAnimation(viewTutorial)
 
             // restore the dim effect
             view.findViewById<RelativeLayout>(R.id.layout_title).alpha = 1F
@@ -268,23 +292,121 @@ class Title : Fragment(), CardStackListener {
         popupWindow.isFocusable = true // any unexpected action: close the credits
         popupWindow.showAtLocation(view, Gravity.CENTER, 0, 0)
 
-        tutorialAnimation(viewTutorial)
+        tutorialAnimation(viewTutorial, popupWindow)
     }
 
-    private fun tutorialAnimation(viewTutorial: View) {
+    private fun tutorialClearAnimation(viewTutorial: View) {
+        viewTutorial.findViewById<ImageView>(R.id.tuto_thumbUp_bts).clearAnimation()
+        viewTutorial.findViewById<TextView>(R.id.tuto_thumbUp_text).clearAnimation()
+        viewTutorial.findViewById<ImageView>(R.id.tuto_thumbDown_bts).clearAnimation()
+        viewTutorial.findViewById<TextView>(R.id.tuto_thumbDown_text).clearAnimation()
+        viewTutorial.findViewById<TextView>(R.id.tuto_end_text).clearAnimation()
 
-        val thumbUp = viewTutorial.findViewById<ImageView>(R.id.tuto_thumbUp_bts)
-        val thumbDown = viewTutorial.findViewById<ImageView>(R.id.tuto_thumbDown_bts)
+//        viewTutorial.findViewById<ImageView>(R.id.tuto_thumbUp_bts).animation = null
+//        viewTutorial.findViewById<TextView>(R.id.tuto_thumbUp_text).animation = null
+//        viewTutorial.findViewById<ImageView>(R.id.tuto_thumbDown_bts).animation = null
+//        viewTutorial.findViewById<TextView>(R.id.tuto_thumbDown_text).animation = null
+//        viewTutorial.findViewById<TextView>(R.id.tuto_end_text).animation = null
+    }
 
-        thumbUp.animate()
-                .translationXBy(200f)
+    private fun tutorialAnimation(viewTutorial: View, popupWindow : PopupWindow) {
+
+        val thumbUpBtn = viewTutorial.findViewById<ImageView>(R.id.tuto_thumbUp_bts)
+        val thumbUpText = viewTutorial.findViewById<TextView>(R.id.tuto_thumbUp_text)
+        val thumbDownBtn = viewTutorial.findViewById<ImageView>(R.id.tuto_thumbDown_bts)
+        val thumbDownText = viewTutorial.findViewById<TextView>(R.id.tuto_thumbDown_text)
+        val endText = viewTutorial.findViewById<TextView>(R.id.tuto_end_text)
+
+        thumbUpText.alpha = 0f
+        thumbDownText.alpha = 0f
+        endText.alpha = 0f
+
+        // the first-phase animation
+        val growingAniTime : Long = 500
+        val showingTextTime : Long = 1000
+
+        thumbUpBtn.animate()
+                .translationXBy(-300f)
                 .translationYBy(-200f)
-                .duration = 1000
-
-        thumbUp.animate()
                 .scaleXBy(1.5f)
                 .scaleYBy(1.5f)
-                .duration = 1000
+                .setDuration(growingAniTime)
+                .start()
+
+        thumbUpText.animate()
+                .alpha(1f)
+                .setStartDelay(growingAniTime)
+                .setDuration(growingAniTime)
+                .withEndAction {
+
+                    thumbUpText.animate()
+                            .alpha(0f)
+                            .setStartDelay(growingAniTime + showingTextTime)
+                            .setDuration(growingAniTime + 300)
+                            .start()
+
+                    thumbUpBtn.animate()
+                            .translationX(0f)
+                            .translationY(0f)
+                            .scaleX(1f)
+                            .scaleY(1f)
+                            .setStartDelay(growingAniTime + showingTextTime)
+                            .setDuration(growingAniTime)
+                            .start()
+                }
+                .start()
+
+        // the second-phase animation
+        val firstAniTime = (growingAniTime * 3) + showingTextTime + 1000
+
+        thumbDownBtn.animate()
+                .translationXBy(300f)
+                .translationYBy(-200f)
+                .scaleXBy(1.5f)
+                .scaleYBy(1.5f)
+                .setStartDelay(firstAniTime)
+                .setDuration(growingAniTime)
+                .start()
+
+        thumbDownText.animate()
+                .alpha(1f)
+                .setStartDelay(firstAniTime + growingAniTime)
+                .setDuration(growingAniTime)
+                .withEndAction {
+
+                    thumbDownText.animate()
+                            .alpha(0f)
+                            .setStartDelay(growingAniTime + showingTextTime)
+                            .duration = growingAniTime + 300
+
+                    thumbDownBtn.animate()
+                            .translationX(0f)
+                            .translationY(0f)
+                            .scaleX(1f)
+                            .scaleY(1f)
+                            .setStartDelay(growingAniTime + showingTextTime)
+                            .duration = growingAniTime
+                }
+                .start()
+
+        // End
+        val secondAniTime = firstAniTime * 2
+
+        endText.animate()
+                .alpha(1F)
+                .setStartDelay(secondAniTime)
+                .setDuration(growingAniTime)
+                .withEndAction {
+                    // close after some delay
+                    endText.animate()
+                            .alpha(0.9f)
+                            .setStartDelay(2000)
+                            .withEndAction {
+                                popupWindow.dismiss()
+                            }
+                            .duration = 1000
+                }
+                .start()
     }
 
     private fun loadNewCards(inflater: LayoutInflater, view: View, sharedPref: SharedPreferences) {
@@ -316,10 +438,10 @@ class Title : Fragment(), CardStackListener {
                             (activity as MainActivity).setProgressIndicator(view, false)
 
                             // run tutorial for the new user
-                            isFirstAttempt = true
-                            if(isFirstAttempt) {
+//                            isFirstAttempt = true
+                            if((activity as MainActivity).isFirstAttempt) {
                                 createTutorialWindow(inflater, view)
-                                isFirstAttempt = false
+                                (activity as MainActivity).isFirstAttempt = false
                             }
 
                             activateButtonState(view)
