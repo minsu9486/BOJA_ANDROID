@@ -16,22 +16,12 @@
 
 package com.example.android.navigationadvancedsample.homescreen
 
-import android.animation.ValueAnimator.INFINITE
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.view.animation.AccelerateInterpolator
-import android.view.animation.Animation
-import android.view.animation.AnimationSet
-import android.view.animation.ScaleAnimation
-import android.widget.Button
-import android.widget.ImageView
-import android.widget.TextView
-import android.widget.Toast
+import android.view.*
+import android.widget.*
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
@@ -62,6 +52,7 @@ class Title : Fragment(), CardStackListener {
 
     private val mMaxSize = 4 // 10
     private var userID = 0
+    private var isFirstAttempt = false
 
     private var mCurrIndex = 0
     private var mCards = arrayOfNulls<CardMovie>(mMaxSize)
@@ -87,6 +78,8 @@ class Title : Fragment(), CardStackListener {
         // no login data
         if(didLogIn == false) {
 
+            isFirstAttempt = true
+
             // hide the bottom navigation
             (activity as MainActivity).setBottomNavigationVisibility(View.INVISIBLE)
 
@@ -106,20 +99,19 @@ class Title : Fragment(), CardStackListener {
             view.findViewById<Button>(R.id.loadRecoMovies_bts).setOnClickListener {
                 resetData()
                 initButtonState(view)
-                loadNewCards(view, sharedPref)
+                loadNewCards(inflater, view, sharedPref)
             }
 
             initButtonState(view)
 
+            // if it is no data...
+            if (mCards[0] == null) {
+                loadNewCards(inflater, view, sharedPref) // only load a set of data when there is no data
+            }
             // if there is a prev data...
-            if (mCards[0] != null) {
+            else {
                 activateButtonState(view)
                 setCardLayout(view)
-            }
-            // if it is the FIRST attempt...
-            else {
-                loadNewCards(view, sharedPref) // only load a set of data when there is no data
-//                onboardingAnimation(view)
             }
         }
 
@@ -240,36 +232,62 @@ class Title : Fragment(), CardStackListener {
             view.findViewById<TextView>(R.id.data_type).text = "Ⓒ"
     }
 
-    private fun onboardingAnimation(view: View) {
-        val expandAndShrink = AnimationSet(true)
+    private fun createTutorialWindow(inflater: LayoutInflater, view: View) {
 
-        val expand = ScaleAnimation(
-                1f, 1.5f,
-                1f, 1.5f,
-                Animation.RELATIVE_TO_SELF, 0.5f,
-                Animation.RELATIVE_TO_SELF, 0.5f)
-        expand.duration = 1000
+        // Custom view to show in popup window
+        val viewTutorial = inflater.inflate(R.layout.layout_title_tutorial, null)
+        val popupWindow = PopupWindow(
+                viewTutorial,
+                RelativeLayout.LayoutParams.MATCH_PARENT,
+                RelativeLayout.LayoutParams.MATCH_PARENT
+        )
 
-        val shrink = ScaleAnimation(
-                1.5f, 1f,
-                1.5f, 1f,
-                Animation.RELATIVE_TO_SELF, 0.5f,
-                Animation.RELATIVE_TO_SELF, 0.5f)
-        shrink.startOffset = 1000
-        shrink.duration = 1000
+        // close the credits when a user touches the screen
+        viewTutorial.findViewById<RelativeLayout>(R.id.layout_title_tutorial).setOnTouchListener { _, event ->
+            if (event.action == MotionEvent.ACTION_DOWN) {
+                popupWindow.dismiss()
+            }
+            true
+        }
 
-        expandAndShrink.addAnimation(expand)
-        expandAndShrink.addAnimation(shrink)
-        expandAndShrink.fillAfter = true
-        expandAndShrink.interpolator = AccelerateInterpolator(1.0f)
-//        expandAndShrink.repeatCount = INFINITE
-//        expandAndShrink.startOffset = 1000
+        //Set a dismiss listener for the credits
+        popupWindow.setOnDismissListener {
 
-        view.findViewById<ImageView>(R.id.deco_thumbDown_bts).animation = expandAndShrink
-        view.findViewById<ImageView>(R.id.deco_thumbDown_bts).animate()
+            viewTutorial.findViewById<ImageView>(R.id.tuto_thumbUp_bts).clearAnimation()
+            viewTutorial.findViewById<ImageView>(R.id.tuto_thumbDown_bts).clearAnimation()
+
+            // restore the dim effect
+            view.findViewById<RelativeLayout>(R.id.layout_title).alpha = 1F
+        }
+
+        // dim effect
+        view.findViewById<RelativeLayout>(R.id.layout_title).alpha = 0.6F
+
+        // show the tutorial
+        popupWindow.isOutsideTouchable = false
+        popupWindow.isFocusable = true // any unexpected action: close the credits
+        popupWindow.showAtLocation(view, Gravity.CENTER, 0, 0)
+
+        tutorialAnimation(viewTutorial)
     }
 
-    private fun loadNewCards(view: View, sharedPref: SharedPreferences) {
+    private fun tutorialAnimation(viewTutorial: View) {
+
+        val thumbUp = viewTutorial.findViewById<ImageView>(R.id.tuto_thumbUp_bts)
+        val thumbDown = viewTutorial.findViewById<ImageView>(R.id.tuto_thumbDown_bts)
+
+        thumbUp.animate()
+                .translationXBy(200f)
+                .translationYBy(-200f)
+                .duration = 1000
+
+        thumbUp.animate()
+                .scaleXBy(1.5f)
+                .scaleYBy(1.5f)
+                .duration = 1000
+    }
+
+    private fun loadNewCards(inflater: LayoutInflater, view: View, sharedPref: SharedPreferences) {
         (activity as MainActivity).setProgressIndicator(view, true)
 
         userID = sharedPref?.getInt("user_id", 0)!!
@@ -296,6 +314,13 @@ class Title : Fragment(), CardStackListener {
                             Log.v(TAG, "Success: $data")
 
                             (activity as MainActivity).setProgressIndicator(view, false)
+
+                            // run tutorial for the new user
+                            isFirstAttempt = true
+                            if(isFirstAttempt) {
+                                createTutorialWindow(inflater, view)
+                                isFirstAttempt = false
+                            }
 
                             activateButtonState(view)
 
