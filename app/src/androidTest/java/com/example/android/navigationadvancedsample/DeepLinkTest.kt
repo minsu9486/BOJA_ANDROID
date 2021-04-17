@@ -27,6 +27,7 @@ import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.rule.ActivityTestRule
+import com.example.android.BOJA.MainActivity
 import org.hamcrest.CoreMatchers.allOf
 import org.junit.Rule
 import org.junit.Test

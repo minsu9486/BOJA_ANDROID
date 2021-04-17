@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.example.android.navigationadvancedsample.formscreen
+package com.example.android.BOJA.formscreen
 
 import android.annotation.SuppressLint
 import android.os.Bundle
@@ -25,9 +25,8 @@ import android.view.ViewGroup
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
-import com.example.android.navigationadvancedsample.MainActivity
-import com.example.android.navigationadvancedsample.R
-import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.example.android.BOJA.MainActivity
+import com.example.android.BOJA.R
 
 
 /**

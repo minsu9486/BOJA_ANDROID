@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.example.android.navigationadvancedsample
+package com.example.android.BOJA
 
 import android.opengl.Visibility
 import android.os.Bundle
@@ -30,6 +30,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.progressindicator.CircularProgressIndicator
 import android.view.ViewGroup.LayoutParams
 import android.view.WindowManager
+import com.example.android.BOJA.R
 
 /**
  * An activity that inflates a layout that has a [BottomNavigationView].

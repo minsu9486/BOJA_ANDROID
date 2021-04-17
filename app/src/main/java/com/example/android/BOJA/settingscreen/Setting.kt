@@ -1,4 +1,4 @@
-package com.example.android.navigationadvancedsample.settingscreen
+package com.example.android.BOJA.settingscreen
 
 import android.content.Context
 import android.os.Build
@@ -13,8 +13,8 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat.getSystemService
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
-import com.example.android.navigationadvancedsample.MainActivity
-import com.example.android.navigationadvancedsample.R
+import com.example.android.BOJA.MainActivity
+import com.example.android.BOJA.R
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
 

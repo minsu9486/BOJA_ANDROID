@@ -24,7 +24,7 @@
 
     <fragment
         android:id="@+id/leaderboard"
-        android:name="com.example.android.navigationadvancedsample.listscreen.Leaderboard"
+        android:name="com.example.android.BOJA.listscreen.Leaderboard"
         android:label="@string/title_list"
         tools:layout="@layout/fragment_leaderboard">
     </fragment>

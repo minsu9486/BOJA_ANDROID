@@ -1,4 +1,4 @@
-package com.example.android.navigationadvancedsample.homescreen
+package com.example.android.BOJA.homescreen
 
 import android.graphics.Color
 import android.os.Parcel
@@ -10,8 +10,8 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.recyclerview.widget.RecyclerView
-import com.example.android.navigationadvancedsample.MainActivity
-import com.example.android.navigationadvancedsample.R
+import com.example.android.BOJA.MainActivity
+import com.example.android.BOJA.R
 import com.github.kittinunf.fuel.httpGet
 import com.github.kittinunf.result.Result
 import com.squareup.picasso.Picasso

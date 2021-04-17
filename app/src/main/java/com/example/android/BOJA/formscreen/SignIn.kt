@@ -1,4 +1,4 @@
-package com.example.android.navigationadvancedsample.formscreen
+package com.example.android.BOJA.formscreen
 
 import android.content.Context
 import android.os.Bundle
@@ -11,8 +11,8 @@ import android.widget.EditText
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
-import com.example.android.navigationadvancedsample.MainActivity
-import com.example.android.navigationadvancedsample.R
+import com.example.android.BOJA.MainActivity
+import com.example.android.BOJA.R
 import com.github.kittinunf.fuel.core.extensions.authentication
 import com.github.kittinunf.fuel.core.extensions.cUrlString
 import com.github.kittinunf.fuel.httpPost
@@ -50,7 +50,8 @@ class SignIn : Fragment() {
 
                                 (activity as MainActivity).setProgressIndicator(view, false)
 
-                                val message = JSONObject(data).getString("message")?:"Error"
+                                val message = if (data.isEmpty()) "Error" else JSONObject(data).getString("message")
+
                                 Toast.makeText(view.context, message, Toast.LENGTH_LONG).show()
                             }
                             is Result.Success -> {

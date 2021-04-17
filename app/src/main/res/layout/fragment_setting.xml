@@ -6,7 +6,7 @@
     android:id="@+id/constraintLayout_setting"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.android.navigationadvancedsample.settingscreen.Setting">
+    tools:context="com.example.android.BOJA.settingscreen.Setting">
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"

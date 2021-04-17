@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.example.android.navigationadvancedsample.homescreen
+package com.example.android.BOJA.homescreen
 
 import android.animation.ValueAnimator.INFINITE
 import android.animation.ValueAnimator.RESTART
@@ -29,8 +29,8 @@ import android.widget.*
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
-import com.example.android.navigationadvancedsample.MainActivity
-import com.example.android.navigationadvancedsample.R
+import com.example.android.BOJA.MainActivity
+import com.example.android.BOJA.R
 import com.github.kittinunf.fuel.core.extensions.authentication
 import com.github.kittinunf.fuel.core.extensions.cUrlString
 import com.github.kittinunf.fuel.httpGet
@@ -45,7 +45,7 @@ import kotlin.properties.Delegates
 
 
 /**
- * Shows the main title screen with a button that navigates to [About].
+ * Shows the main title screen with a button.
  */
 class Title : Fragment(), CardStackListener {
 

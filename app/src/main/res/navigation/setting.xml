@@ -24,7 +24,7 @@
 
         <fragment
                 android:id="@+id/setting"
-                android:name="com.example.android.navigationadvancedsample.settingscreen.Setting"
+                android:name="com.example.android.BOJA.settingscreen.Setting"
                 android:label="Setting"
                 tools:layout="@layout/fragment_setting">
         </fragment>

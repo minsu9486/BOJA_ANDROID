@@ -16,15 +16,15 @@
 
 <resources>
     <string name="app_name">BOJA</string>
-    <string name="url_main">http://54.186.209.157:3000/</string>
+    <string name="url_main">http://52.34.189.150:3000/</string>
 <!--    <string name="url_main">http://10.0.2.2:3000/</string>-->
 
 <!--    Azure-->
 <!--    // Minsu-->
-<!--    <string name="Azure_key">465abd11794b450aab459f7e79a29df3</string>-->
+    <string name="Azure_key">465abd11794b450aab459f7e79a29df3</string>
 <!--    // Yong-->
 <!--    <string name="Azure_key">8baff0c372ab4e46b5cb75d15050c7f8</string>-->
-    <string name="Azure_key">dummy</string>
+<!--    <string name="Azure_key">dummy</string>-->
     <string name="Azure_Search_URL">https://api.bing.microsoft.com/v7.0/images/search</string>
 
     <string name="select_an_avatar">Select an Avatar</string>
@@ -34,19 +34,6 @@
     <string name="sign_up">sign up</string>
     <string name="profile_name_1">Ali Connors</string>
     <string name="profile_image">Profile image</string>
-    <string name="user_points">10,000 pts</string>
-    <string name="user_rank">#1</string>
-    <string name="rank">Rank</string>
-    <string name="rank_1">#1</string>
-    <string name="wins">Wins</string>
-    <string name="wins_amount">42</string>
-    <string name="losses">Losses</string>
-    <string name="losses_amount">03</string>
-    <string name="about">About</string>
-    <string name="welcome">Welcome!</string>
-    <string name="about_description">This sample showcases navigation using a Bottom Navigation
-    View. The state and back stack of the three different screens are persisted.
-    </string>
     <string name="done">Done</string>
     <string name="title_about">About</string>
     <string name="title_home">Recommended Movies</string>

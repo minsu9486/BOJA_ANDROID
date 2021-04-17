@@ -25,7 +25,7 @@
 <!--    Login-->
     <fragment
         android:id="@+id/register"
-        android:name="com.example.android.navigationadvancedsample.formscreen.Register"
+        android:name="com.example.android.BOJA.formscreen.Register"
         android:label="@string/title_register"
         tools:layout="@layout/fragment_register">
         <action
@@ -37,7 +37,7 @@
     </fragment>
     <fragment
         android:id="@+id/signIn"
-        android:name="com.example.android.navigationadvancedsample.formscreen.SignIn"
+        android:name="com.example.android.BOJA.formscreen.SignIn"
         android:label="Sign In"
         tools:layout="@layout/fragment_sign_in">
         <action
@@ -46,7 +46,7 @@
     </fragment>
     <fragment
         android:id="@+id/registered"
-        android:name="com.example.android.navigationadvancedsample.formscreen.Registered"
+        android:name="com.example.android.BOJA.formscreen.Registered"
         android:label="Registered"
         tools:layout="@layout/fragment_registered">
         <action
@@ -57,7 +57,7 @@
 <!--    Home-->
     <fragment
         android:id="@+id/titleScreen"
-        android:name="com.example.android.navigationadvancedsample.homescreen.Title"
+        android:name="com.example.android.BOJA.homescreen.Title"
         android:label="@string/title_home"
         tools:layout="@layout/fragment_title">
 <!--        <action-->
@@ -69,7 +69,7 @@
     </fragment>
 <!--    <fragment-->
 <!--        android:id="@+id/aboutScreen"-->
-<!--        android:name="com.example.android.navigationadvancedsample.homescreen.About"-->
+<!--        android:name="com.example.android.BOJA.homescreen.About"-->
 <!--        android:label="@string/title_about"-->
 <!--        tools:layout="@layout/fragment_about"/>-->
 </navigation>

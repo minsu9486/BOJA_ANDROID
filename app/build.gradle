@@ -22,7 +22,7 @@ android {
     buildToolsVersion "30.0.3"
 
     defaultConfig {
-        applicationId "com.example.android.navigationadvancedsample"
+        applicationId "com.example.android.BOJA"
         minSdkVersion build_versions.min_sdk
         targetSdkVersion build_versions.target_sdk
         versionCode 1
@@ -77,4 +77,7 @@ dependencies {
     // HTTP Request
     implementation 'com.github.kittinunf.fuel:fuel:2.3.1'
     implementation 'com.github.kittinunf.fuel:fuel-android:2.3.1'
+
+//    // Room
+//    implementation "androidx.room:room-runtime:2.2.6"
 }

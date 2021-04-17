@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.example.android.navigationadvancedsample.listscreen
+package com.example.android.BOJA.listscreen
 
 import android.content.Context
 import android.graphics.Color
@@ -31,10 +31,10 @@ import androidx.appcompat.widget.AppCompatTextView
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.android.navigationadvancedsample.MainActivity
-import com.example.android.navigationadvancedsample.R
-import com.example.android.navigationadvancedsample.homescreen.CardAdapter
-import com.example.android.navigationadvancedsample.homescreen.CardMovie
+import com.example.android.BOJA.MainActivity
+import com.example.android.BOJA.R
+import com.example.android.BOJA.homescreen.CardAdapter
+import com.example.android.BOJA.homescreen.CardMovie
 import com.github.kittinunf.fuel.core.extensions.cUrlString
 import com.github.kittinunf.fuel.httpGet
 import com.github.kittinunf.result.Result
@@ -249,7 +249,7 @@ class MyAdapter(private val view : View, private val userID : Int, private val m
 
                             (view.context as MainActivity).setProgressIndicator(view, false)
 
-                            val message = JSONObject(data).getString("message")?:"Error"
+                            val message = if (data.isEmpty()) "Error" else JSONObject(data).getString("message")
                             Toast.makeText(view.context, message, Toast.LENGTH_LONG).show()
                         }
                         is Result.Success -> {
