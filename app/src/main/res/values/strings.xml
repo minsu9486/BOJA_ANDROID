@@ -21,9 +21,9 @@
 
 <!--    Azure-->
 <!--    // Minsu-->
-    <string name="Azure_key">465abd11794b450aab459f7e79a29df3</string>
+<!--    <string name="Azure_key">465abd11794b450aab459f7e79a29df3</string>-->
 <!--    // Yong-->
-<!--    <string name="Azure_key">8baff0c372ab4e46b5cb75d15050c7f8</string>-->
+    <string name="Azure_key">8baff0c372ab4e46b5cb75d15050c7f8</string>
 <!--    <string name="Azure_key">dummy</string>-->
     <string name="Azure_Search_URL">https://api.bing.microsoft.com/v7.0/images/search</string>
 
