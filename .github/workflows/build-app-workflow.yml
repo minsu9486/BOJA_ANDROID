@@ -12,8 +12,7 @@ jobs:
     steps:
       - name: Check out repository code
         uses: actions/checkout@v2
-      - name: Make gradlew executable
-        run: git update-index --chmod=+x gradlew
-             git commit -m "Make gradlew executable"
-      - name: Build the app
+      - name: Change wrapper permissions
+        run: chmod +x ./gradlew
+      - name: Build with Gradle
         run: ./gradlew build
